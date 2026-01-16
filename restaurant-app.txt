@@ -1,0 +1,2 @@
+project url - https://ygvncynjmwnbjztuydmo.supabase.co
+publishable apikey - sb_publishable_aBSGkGu4wYZCl4fK6yAesQ_7thPxZJZ
