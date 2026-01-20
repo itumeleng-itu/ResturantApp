@@ -3,11 +3,13 @@ import { Button } from '@rneui/themed';
 import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useState } from 'react';
 import LoginForm from '@/components/ui/SignIn';
 
 export default function SignIn() {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
+  
+
 
   return (
     <View 

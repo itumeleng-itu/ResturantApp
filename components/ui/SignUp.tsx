@@ -29,7 +29,7 @@ export default function Login() {
           <Text className="text-gray-400 text-base mt-1">deliciousness delivered fast</Text>
         </View>
 
-        {/* Animation/Image Placeholder */}
+        {/* Animation */}
         <View style={{ width: 300, height: 200 }}>
             <LottieView
                 source={require('../../assets/animations/fastfood.json')}
@@ -39,7 +39,6 @@ export default function Login() {
             />
         </View>
 
-        {/* Subtitle */}
         <Text className="text-black/80 italic font-semibold text-md mt-4 mb-8">Login to your account</Text>
 
         {/* Email Input */}

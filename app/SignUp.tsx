@@ -1,13 +1,17 @@
-import LottieView from 'lottie-react-native';
-import { Button } from '@rneui/themed';
+import SignUpForm from '@/components/ui/SignUp';
 import { useRouter } from "expo-router";
-import { Text, View } from "react-native";
+import { useState } from 'react';
+import { View } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import LoginForm from '@/components/ui/SignIn';
+import { supabase } from '../lib/supabase';
 
-export default function SignIn() {
+export default function SignUp() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [loading, setLoading] = useState(false)
+  
+
+ 
 
   return (
     <View 
@@ -17,7 +21,7 @@ export default function SignIn() {
         paddingBottom: insets.bottom 
       }}
     >
-        <LoginForm/>
+        <SignUpForm/>
 
     </View>
   );

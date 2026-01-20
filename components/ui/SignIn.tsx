@@ -1,19 +1,24 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'expo-router';
 import LottieView from 'lottie-react-native';
+import { useState } from 'react';
+import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
-export default function Login() {
+export default function LoginForm() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login, loading, error } = useAuth();
 
-  const handleLogin = () => {
-    // Add your login logic here
-    console.log('Login:', { email, password });
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert('Please fill in all the fields');
+      return;
+    }
+    await login(email, password);
   };
 
   return (
