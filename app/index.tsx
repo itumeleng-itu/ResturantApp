@@ -12,7 +12,7 @@ export default function Landing() {
   useEffect(() => {
     // Animation duration: 240 frames ÷ 30 fps = 8000ms
     const timer = setTimeout(() => {
-      router.replace('/SignIn'); 
+      router.replace('/(tabs)/home'); 
     }, 6500);
 
     // Cleanup timer on unmount

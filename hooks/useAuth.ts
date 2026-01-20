@@ -1,8 +1,8 @@
 // hooks/useAuth.ts
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { useRouter } from 'expo-router';
 
 export function useAuth() {
     const [loading, setLoading] = useState(false);
@@ -22,8 +22,7 @@ export function useAuth() {
 
             if (error) throw error;
 
-            Alert.alert('Success!', 'Logged in successfully');
-            router.replace('/(tabs)/home'); // Navigate to your menu page
+            router.replace('/(tabs)/home'); //to your menu page
 
             return { success: true, data };
         } catch (err: any) {
@@ -40,7 +39,7 @@ export function useAuth() {
     const signup = async (
         email: string,
         password: string,
-        userData?: { name?: string; surname?: string; contact_number?: string ; address?: object, card_details?:object}
+        userData?: { name?: string; surname?: string; contact_number?: string; address?: object, card_details?: object }
     ) => {
         setLoading(true);
         setError(null);

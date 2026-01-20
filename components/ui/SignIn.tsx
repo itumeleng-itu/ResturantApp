@@ -34,7 +34,7 @@ export default function LoginForm() {
         contentContainerStyle={{ flexGrow: 1 }}
       >
       {/* Content Container */}
-      <View className="flex-1 items-center px-8 pt-1">
+      <View className="flex-1 items-center px-4 pt-1">
         {/* Logo & Tagline */}
         <View className="items-center mb-4">
           <Text className="text-3xl font-bold text-orange-600">the eatery</Text>
@@ -55,7 +55,7 @@ export default function LoginForm() {
         <Text className="text-black/40 italic font-semibold text-md mt-4 mb-8">Login to your account</Text>
 
         {/* Email Input */}
-        <View className="w-full px-6 mb-4">
+        <View className="w-full px-4 mb-4">
           <Text className="text-black/80 text-sm font-semibold mb-2 ml-1">Email</Text>
           <TextInput
             className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg"
@@ -69,7 +69,7 @@ export default function LoginForm() {
         </View>
 
         {/* Password Input */}
-        <View className="w-full px-6 mb-4">
+        <View className="w-full px-4 mb-4">
           <Text className="text-black/80 text-sm font-semibold mb-2 ml-1">Password</Text>
           <TextInput
             className="w-full h-12 px-4 bg-white border border-gray-200 rounded-lg"
