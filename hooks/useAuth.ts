@@ -40,7 +40,7 @@ export function useAuth() {
     const signup = async (
         email: string,
         password: string,
-        userData?: { name?: string; surname?: string; contact_number?: string }
+        userData?: { name?: string; surname?: string; contact_number?: string ; address?: object, card_details?:object}
     ) => {
         setLoading(true);
         setError(null);
@@ -53,7 +53,6 @@ export function useAuth() {
                     data: userData || {}
                 }
             });
-
             if (error) throw error;
 
             Alert.alert(

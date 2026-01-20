@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import LottieView from 'lottie-react-native';
 import { useRouter } from "expo-router";
+import LottieView from 'lottie-react-native';
+import { useEffect, useRef } from 'react';
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -46,7 +46,7 @@ export default function Landing() {
 
       {/* Tagline */}
       <View className="items-center">
-        <Text className="text-gray-400 italic text-lg">the home of local fast bites.</Text>
+        <Text className="text-gray-400 italic text-lg">the home of best local fast bites.</Text>
       </View>
     </View>
   );

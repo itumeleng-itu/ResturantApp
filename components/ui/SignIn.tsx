@@ -2,7 +2,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'expo-router';
 import LottieView from 'lottie-react-native';
 import { useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
@@ -22,10 +22,17 @@ export default function LoginForm() {
   };
 
   return (
-    <View 
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1 bg-white"
       style={{ paddingTop: insets.top }}
     >
+      <ScrollView 
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
       {/* Content Container */}
       <View className="flex-1 items-center px-8 pt-1">
         {/* Logo & Tagline */}
@@ -75,7 +82,7 @@ export default function LoginForm() {
         </View>
 
         {/* Login Button */}
-        <View className="w-full px-6 mb-4">
+        <View className="w-full px-4 mb-4">
             <TouchableOpacity 
             className="w-full h-14 bg-orange-600 rounded-full items-center justify-center mt-4"
             onPress={handleLogin}
@@ -95,6 +102,7 @@ export default function LoginForm() {
         </View>
 
       </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
