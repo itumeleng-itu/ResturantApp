@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 type FoodCardProps = {
   item: {
@@ -12,14 +12,12 @@ type FoodCardProps = {
   };
   width: number;
   onPress?: () => void;
-  onAddPress?: () => void;
 };
 
 export default function FoodCard({ 
   item, 
   width, 
-  onPress, 
-  onAddPress 
+  onPress
 }: FoodCardProps) {
   const [imageError, setImageError] = useState(false);
   const hasImage = item.image_url && !imageError;
@@ -64,29 +62,12 @@ export default function FoodCard({
         Premium Quality
       </Text>
 
-      {/* Price & Add Button */}
-      <View className="flex-row justify-between items-center mt-4">
+      {/* Price - */}
+      <View className="items-start mt-4">
         <Text className="font-extrabold text-sm text-black">
-          <Text className="text-[#ea770c] font-normal">R </Text>
+          <Text className="text-[#ea770c] font-bold">R </Text>
           {item.price.toFixed(2)}
         </Text>
-
-        {/* Add Button */}
-        <TouchableOpacity
-          onPress={(e) => {
-            e.stopPropagation(); 
-            if (onAddPress && item.is_available) {
-              onAddPress();
-            }
-          }}
-          disabled={!item.is_available}
-          className={`w-8 h-8 rounded-full items-center justify-center ${
-            item.is_available ? 'bg-black' : 'bg-gray-400'
-          }`}
-          activeOpacity={0.7}
-        >
-          <MaterialIcons name="add" size={18} color="white" />
-        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );

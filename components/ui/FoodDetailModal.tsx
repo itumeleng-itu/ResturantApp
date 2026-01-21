@@ -172,7 +172,7 @@ export default function FoodDetailModal({
             >
               <Text
                 className={`text-lg font-bold ${
-                  item.is_available ? 'text-black' : 'text-gray-400'
+                  item.is_available ? 'text-white' : 'text-gray-400'
                 }`}
               >
                 {item.is_available
