@@ -129,7 +129,7 @@ export default function FoodDetailModal({
             </Text>
 
             {/* Price */}
-            <Text className="text-yellow-400 text-2xl font-bold mb-6">
+            <Text className="text-[#ffffff] text-2xl font-bold mb-6">
               R{item.price.toFixed(2)}
             </Text>
 
@@ -167,7 +167,7 @@ export default function FoodDetailModal({
               onPress={handleAddToCart}
               disabled={!item.is_available}
               className={`w-full py-4 rounded-full items-center justify-center ${
-                item.is_available ? 'bg-yellow-400' : 'bg-gray-600'
+                item.is_available ? 'bg-[#ea770c]' : 'bg-gray-600'
               }`}
             >
               <Text

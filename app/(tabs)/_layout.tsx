@@ -4,7 +4,7 @@ import React from 'react';
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { Ionicons, MaterialIcons, FontAwesome, AntDesign, Entypo } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 export default function TabLayout() {
@@ -54,7 +54,7 @@ export default function TabLayout() {
         name="orders"
         options={{
           title: 'Orders',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="shopping-cart" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="receipt" color={color} />,
         }}
       />
       <Tabs.Screen

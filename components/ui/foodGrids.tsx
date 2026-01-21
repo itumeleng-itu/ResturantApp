@@ -13,11 +13,13 @@ import {
 import FoodCard from './FoodCard';
 import FoodDetailModal, { FoodItem } from './FoodDetailModal';
 
-// Hook
+// Hooks
+import { useCart } from "@/hooks/useCart";
 import { useGetData } from "@/hooks/useGetData";
 
 export default function FoodGrids() {
   const { getAllItems, loading } = useGetData();
+  const { addToCart } = useCart();
   
   const [items, setItems] = useState<FoodItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
@@ -50,16 +52,16 @@ export default function FoodGrids() {
     setSelectedItem(null);
   };
 
-  // Handle add to cart from modal
+  // Handle add to cart from modal (with quantity)
   const handleAddToCart = (item: FoodItem, quantity: number) => {
-    console.log('Add to cart:', item.name, 'Quantity:', quantity, 'Total:', item.price * quantity);
-    // TODO: Implement actual cart logic
+    addToCart(item, quantity);
+    console.log('Added to cart:', item.name, 'x', quantity);
   };
 
-  // Handle quick add from card
+  // Handle quick add from card (adds 1 item)
   const handleQuickAdd = (item: FoodItem) => {
-    console.log('Quick add to cart:', item.name);
-    // TODO: Add single item to cart
+    addToCart(item, 1);
+    console.log('Quick added to cart:', item.name);
   };
 
   // Loading state

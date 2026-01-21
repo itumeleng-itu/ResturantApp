@@ -1,18 +1,20 @@
 //libraries
-import { Text, View,Pressable } from "react-native";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Pressable, Text, View } from "react-native";
 
 //hooks
+import { useCart } from "@/hooks/useCart";
 import { useRouter } from "expo-router";
 
 
 export default function Header (){
     const router = useRouter();
-
-    //navigate to orders onclick
-    function navToOrders() {
-    router.push('/orders')
-  }
+    
+    // Get cart count from cart hook
+    const { cartCount } = useCart();
+    
+    // Check if cart has items
+    const hasItemsInCart = cartCount > 0;
 
     return(
         <View className="flex-row items-center px-6 py-2 justify-between">
@@ -25,10 +27,19 @@ export default function Header (){
         </View>
         <View className="flex-row gap-4">
           <Ionicons name="notifications-outline" size={26} color="black" />
-          <Pressable onPress={navToOrders}>
-             <Ionicons name="cart-outline" size={26} color="black" />
-             {/* Red dot badge for cart */}
-             <View className="absolute -top-1 -right-1 bg-orange-500 w-3 h-3 rounded-full border-2 border-white" />
+          <Pressable>
+             {/* Cart icon - filled when items exist, outline when empty */}
+             <Ionicons 
+               name={hasItemsInCart ? "cart" : "cart-outline"} 
+               size={26} 
+               color="black" 
+             />
+             {/* Red dot badge - only shows when cart has items */}
+             {hasItemsInCart && (
+               <View className="absolute -top-1 -right-1 bg-orange-500 w-4 h-4 rounded-full border-2 border-white items-center justify-center">
+                 <Text className="text-white text-[8px] font-bold">{cartCount > 9 ? '9+' : cartCount}</Text>
+               </View>
+             )}
           </Pressable>
         </View>
       </View>
