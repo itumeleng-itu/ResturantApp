@@ -58,6 +58,12 @@ export default function FoodGrids() {
     console.log('Added to cart:', item.name, 'x', quantity);
   };
 
+  // Handle quick add from card (adds 1 item)
+  const handleQuickAdd = (item: FoodItem) => {
+    addToCart(item, 1);
+    console.log('Quick added to cart:', item.name);
+  };
+
   // Loading state
   if (loading && items.length === 0) {
     return (

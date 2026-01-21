@@ -42,7 +42,7 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export default function CartModal({ visible, onClose }: CartModalProps) {
     const { cartItems, cartTotal, cartCount, updateQuantity, removeFromCart, clearCart } = useCart();
-    const { getCurrentUser } = useAuth();
+    const { getSession } = useAuth();
     const router = useRouter();
     
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -57,17 +57,17 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
 
     const checkAuthStatus = async () => {
         setCheckingAuth(true);
-        const user = await getCurrentUser();
-        setIsLoggedIn(!!user);
+        const session = await getSession();
+        setIsLoggedIn(!!session);
         setCheckingAuth(false);
     };
 
     // Handle checkout press
     const handleCheckout = async () => {
-        // Re-check auth status at checkout time to ensure accuracy
-        const user = await getCurrentUser();
-        
-        if (!user) {
+        // Use getSession from useAuth hook
+        const session = await getSession();
+                
+        if (!session) {
             // User is NOT logged in - show alert with login option
             Alert.alert(
                 'Login Required',
@@ -87,6 +87,7 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
         }
         
         // User IS logged in - proceed to checkout
+        Alert.alert('Checkout', 'Proceeding to checkout...');
         onClose();
         //router.push('/checkout'); // Navigate to checkout screen
     };
@@ -138,7 +139,7 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
                     <View className="flex-row items-center">
                         <TouchableOpacity
                             onPress={() => handleQuantityChange(item.id, item.quantity, -1)}
-                            className="w-8 h-8 rounded-full bg-gray-600 items-center justify-center"
+                            className="w-8 h-8 rounded-full bg-black items-center justify-center"
                         >
                             <MaterialIcons name="remove" size={18} color="white" />
                         </TouchableOpacity>
@@ -149,7 +150,7 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
                         
                         <TouchableOpacity
                             onPress={() => handleQuantityChange(item.id, item.quantity, 1)}
-                            className="w-8 h-8 rounded-full bg-gray-600 items-center justify-center"
+                            className="w-8 h-8 rounded-full bg-black items-center justify-center"
                         >
                             <MaterialIcons name="add" size={18} color="white" />
                         </TouchableOpacity>
@@ -236,13 +237,13 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
                                 {/* Subtotal */}
                                 <View className="flex-row justify-between mb-2">
                                     <Text className="text-gray-400">Subtotal ({cartCount} items)</Text>
-                                    <Text className="text-black font-bold">R{cartTotal.toFixed(2)}</Text>
+                                    <Text className="text-black font-medium">R{cartTotal.toFixed(2)}</Text>
                                 </View>
                                 
                                 {/* Delivery Fee */}
                                 <View className="flex-row justify-between mb-4">
                                     <Text className="text-gray-400">Delivery Fee</Text>
-                                    <Text className="text-black font-bold">R25.00</Text>
+                                    <Text className="text-black font-medium">R25.00</Text>
                                 </View>
 
                                 {/* Total */}
@@ -253,25 +254,14 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
                                     </Text>
                                 </View>
 
-                                {/* Login Warning if not logged in */}
-                                {!isLoggedIn && !checkingAuth && (
-                                    <View className="bg-yellow-900/30 border border-yellow-700 rounded-xl p-3 mb-4 flex-row items-center">
-                                        <Ionicons name="warning" size={20} color="#eab308" />
-                                        <Text className="text-yellow-500 text-sm ml-2 flex-1">
-                                            Please login to proceed to checkout
-                                        </Text>
-                                    </View>
-                                )}
-
                                 {/* Checkout Button */}
                                 <TouchableOpacity
                                     onPress={handleCheckout}
-                                    className={`w-full py-4 rounded-full items-center justify-center ${
-                                        isLoggedIn ? 'bg-[#ea770c]' : 'bg-gray-600'
-                                    }`}
+                                    className={`w-full py-4 rounded-full items-center justify-center 
+                                        ${isLoggedIn ? 'bg-[#ea770c]' : 'bg-black'}`}
                                 >
                                     <Text className={`text-lg font-bold ${
-                                        isLoggedIn ? 'text-white' : 'text-gray-400'
+                                        isLoggedIn ? 'text-white' : 'text-white'
                                     }`}>
                                         {isLoggedIn ? 'Proceed to Checkout' : 'Login to Checkout'}
                                     </Text>
@@ -291,7 +281,7 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
                                     }}
                                     className="mt-3 mb-3 items-center"
                                 >
-                                    <Text className="text-red-500 text-sm">Clear Cart</Text>
+                                    <Text className="text-red-500 font-bold text-md">Clear Cart</Text>
                                 </TouchableOpacity>
                             </View>
                         </>

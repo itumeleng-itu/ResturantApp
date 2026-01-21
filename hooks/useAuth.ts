@@ -80,7 +80,7 @@ export function useAuth() {
             if (error) throw error;
 
             Alert.alert('Success', 'Logged out successfully');
-            router.replace('/SignIn');
+            router.replace('/(tabs)/home');
 
             return { success: true };
         } catch (err: any) {
@@ -105,11 +105,24 @@ export function useAuth() {
         }
     };
 
+    // GET SESSION - more reliable for auth checking
+    const getSession = async () => {
+        try {
+            const { data: { session }, error } = await supabase.auth.getSession();
+            if (error) throw error;
+            return session;
+        } catch (err: any) {
+            console.error('Error getting session:', err.message);
+            return null;
+        }
+    };
+
     return {
         login,
         signup,
         logout,
         getCurrentUser,
+        getSession,
         loading,
         error,
     };
