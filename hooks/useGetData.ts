@@ -36,6 +36,7 @@ export function useGetData() {
             const {data, error} = await supabase
             .from('categories')
             .select('*')
+            .order('name', { ascending: true })
 
             if(error){
                 throw new Error

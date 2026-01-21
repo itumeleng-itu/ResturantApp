@@ -1,72 +1,116 @@
-import { Text, View, ScrollView, TextInput, TouchableOpacity, Image, Dimensions,Pressable } from "react-native";
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+// components/FoodGrids.tsx
+import { MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
+  Text,
+  View
+} from "react-native";
 
+// Components
+import FoodCard from './FoodCard';
+import FoodDetailModal, { FoodItem } from './FoodDetailModal';
 
-//hooks
+// Hook
 import { useGetData } from "@/hooks/useGetData";
-import React, { useState, useEffect } from 'react';
 
+export default function FoodGrids() {
+  const { getAllItems, loading } = useGetData();
+  
+  const [items, setItems] = useState<FoodItem[]>([]);
+  const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  const { width } = Dimensions.get('window');
+  const cardWidth = (width - 60) / 2; // 2 columns with spacing
 
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+  }, []);
 
-export default function FoodGrids (){
+  const loadData = async () => {
+    const data = await getAllItems();
+    if (data) {
+      setItems(data);
+    }
+  };
 
-    const { getAllItems } = useGetData();
-    const [items, setItems] = useState<any[]>([]);
-    const { width } = Dimensions.get('window');
+  // Handle item press - open modal with item details
+  const handleItemPress = (item: FoodItem) => {
+    setSelectedItem(item);
+    setModalVisible(true);
+  };
 
-    useEffect(() => {
-        loadData();
-      }, []);
-    
-      const loadData = async () => {
-        const data = await getAllItems();
-        if (data) {
-          setItems(data);
-        }
-      };
+  // Handle closing the modal
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedItem(null);
+  };
 
-    return(
-        <View className="flex-row flex-wrap justify-between px-6 mt-10">
-          {items.length === 0 ? (
-            <View className="w-full items-center mt-10">
-              <Text className="text-gray-400">Loading delicious food...</Text>
-            </View>
-          ) : (
-            items.map((item) => (
-              <View 
-                key={item.id} 
-                style={{ width: (width - 60) / 2 }} 
-                className="bg-gray-50/50 rounded-[35px] p-4 mb-6 border border-gray-50"
-              >
-                {/* Sale Badge */}
-                <View className="absolute top-4 left-4 bg-black rounded-full px-2 py-1 z-10">
-                  <Text className="text-white text-[9px] font-bold">-25%</Text>
-                </View>
+  // Handle add to cart from modal
+  const handleAddToCart = (item: FoodItem, quantity: number) => {
+    console.log('Add to cart:', item.name, 'Quantity:', quantity, 'Total:', item.price * quantity);
+    // TODO: Implement actual cart logic
+  };
 
-                {/* Image Placeholder */}
-                <View className="w-full h-28 bg-white rounded-3xl mb-4 overflow-hidden items-center justify-center">
-                   {/* In a real app, use: <Image source={{ uri: item.image_url }} /> */}
-                   <MaterialIcons name="fastfood" size={40} color="#e5e7eb" />
-                </View>
+  // Handle quick add from card
+  const handleQuickAdd = (item: FoodItem) => {
+    console.log('Quick add to cart:', item.name);
+    // TODO: Add single item to cart
+  };
 
-                <Text className="text-[13px] font-bold text-center text-gray-800" numberOfLines={1}>
-                  {item.name}
-                </Text>
-                <Text className="text-[10px] text-gray-400 text-center mt-1">
-                  Premium Quality
-                </Text>
+  // Loading state
+  if (loading && items.length === 0) {
+    return (
+      <View className="w-full items-center justify-center mt-20">
+        <ActivityIndicator size="large" color="#ea770c" />
+        <Text className="text-gray-400 mt-4">Loading delicious food...</Text>
+      </View>
+    );
+  }
 
-                <View className="flex-row justify-between items-center mt-4">
-                  <Text className="font-extrabold text-sm text-black">
-                    <Text className="text-orange-500 font-normal">R </Text>{item.price}
-                  </Text>
-                  <TouchableOpacity className="bg-black w-8 h-8 rounded-full items-center justify-center">
-                    <Ionicons name="add" size={18} color="white" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))
-          )}
+  // Empty state
+  if (!loading && items.length === 0) {
+    return (
+      <View className="w-full items-center justify-center px-6 mt-20">
+        <MaterialIcons name="restaurant-menu" size={80} color="#e5e7eb" />
+        <Text className="text-gray-400 text-lg mt-4 text-center">
+          No items available
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <>
+      <ScrollView 
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        <View className="flex-row flex-wrap justify-between px-6 mt-6">
+          {items.map((item) => (
+            <FoodCard
+              key={item.id}
+              item={item}
+              width={cardWidth}
+              onPress={() => handleItemPress(item)}
+              onAddPress={() => handleQuickAdd(item)}
+            />
+          ))}
         </View>
-    )
+      </ScrollView>
+
+      {/* Food Detail Modal */}
+      <FoodDetailModal
+        visible={modalVisible}
+        item={selectedItem}
+        onClose={handleCloseModal}
+        onAddToCart={handleAddToCart}
+      />
+    </>
+  );
 }
