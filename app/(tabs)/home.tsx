@@ -14,6 +14,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useGetData } from "@/hooks/useGetData";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
+import SearchNFilter from "@/components/ui/searchNfilter";
 
 const { width } = Dimensions.get('window');
 
@@ -81,19 +82,7 @@ export default function HomeScreen() {
         </View>
 
         {/* --- 3. SEARCH & FILTER --- */}
-        <View className="px-6 mt-8 flex-row gap-3">
-          <View className="flex-1 flex-row items-center bg-gray-50 rounded-2xl px-4 py-3 border border-gray-100">
-            <Ionicons name="search-outline" size={20} color="#9ca3af" />
-            <TextInput 
-              placeholder="Search for fast food..." 
-              className="ml-2 flex-1 text-gray-600"
-              placeholderTextColor="#9ca3af"
-            />
-          </View>
-          <TouchableOpacity className="bg-black p-4 rounded-2xl justify-center">
-            <Ionicons name="options-outline" size={20} color="white" />
-          </TouchableOpacity>
-        </View>
+        <SearchNFilter/>
 
         {/* --- 4. CIRCULAR CATEGORIES --- */}
         <View className="mt-8">
@@ -115,7 +104,7 @@ export default function HomeScreen() {
                       alignItems: 'center',
                       justifyContent: 'center',
                       elevation: isActive ? 8 : 0,
-                      shadowColor: '#000',
+                      shadowColor: '#fb8c00',
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: isActive ? 0.1 : 0,
                       shadowRadius: 10,
