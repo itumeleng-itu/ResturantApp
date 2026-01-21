@@ -1,7 +1,6 @@
 import {View,TextInput, TouchableOpacity} from "react-native";
 import { Ionicons} from '@expo/vector-icons';
 
-
 export default function SearchNFilter() {
     return(
         <View className="px-6 mt-8 flex-row gap-3">
