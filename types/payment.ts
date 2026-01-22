@@ -6,6 +6,7 @@ export type PaymentCard = {
     card_holder: string;
     expiry_date: string;
     card_type: string;
+    stripe_payment_method_id?: string;
 };
 
 export type PaymentCardDB = {
@@ -17,6 +18,7 @@ export type PaymentCardDB = {
     expiry_month: number;
     expiry_year: number;
     is_default: boolean;
+    stripe_payment_method_id?: string;
     created_at?: string;
 };
 
@@ -29,4 +31,5 @@ export type Card = {
     expiryMonth: number;
     expiryYear: number;
     isDefault: boolean;
+    stripePaymentMethodId?: string;
 };

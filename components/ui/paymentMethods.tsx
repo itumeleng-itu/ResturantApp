@@ -9,7 +9,7 @@ import PaymentMethodOption from '@/components/payment/PaymentMethodOption';
 import SavedCardOption from '@/components/payment/SavedCardOption';
 
 type PaymentMethodSelectorProps = {
-    onMethodSelect?: (method: PaymentMethod, cardId?: string) => void;
+    onMethodSelect?: (method: PaymentMethod, cardId?: string, stripePaymentMethodId?: string) => void;
 };
 
 export default function PaymentMethodSelector({ 
@@ -17,6 +17,7 @@ export default function PaymentMethodSelector({
 }: PaymentMethodSelectorProps) {
     const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
     const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+    const [selectedStripePaymentMethodId, setSelectedStripePaymentMethodId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [savedCards, setSavedCards] = useState<Card[]>([]);
 
@@ -42,7 +43,17 @@ export default function PaymentMethodSelector({
                 console.error("Error fetching cards:", error);
                 setSavedCards([]);
             } else {
-                setSavedCards(data);
+                // Transform database cards to Card type with Stripe payment method ID
+                const transformedCards: Card[] = (data || []).map(card => ({
+                    id: card.id,
+                    last4: card.card_last_four,
+                    brand: card.card_type || 'Card',
+                    expiryMonth: card.expiry_month,
+                    expiryYear: card.expiry_year,
+                    isDefault: card.is_default || false,
+                    stripePaymentMethodId: card.stripe_payment_method_id,
+                }));
+                setSavedCards(transformedCards);
             }
         } catch(error) {
             console.error(error);
@@ -52,12 +63,13 @@ export default function PaymentMethodSelector({
         }
     };
 
-    const handleMethodSelect = (method: PaymentMethod, cardId?: string) => {
+    const handleMethodSelect = (method: PaymentMethod, cardId?: string, stripePaymentMethodId?: string) => {
         setSelectedMethod(method);
         setSelectedCardId(cardId || null);
+        setSelectedStripePaymentMethodId(stripePaymentMethodId || null);
         
         if (onMethodSelect) {
-            onMethodSelect(method, cardId);
+            onMethodSelect(method, cardId, stripePaymentMethodId);
         }
     };
 
@@ -96,7 +108,12 @@ export default function PaymentMethodSelector({
 
     const handleContinue = () => {
         if (selectedMethod === 'saved-card' && selectedCardId) {
-            console.log('Pay with saved card:', selectedCardId);
+            if (selectedStripePaymentMethodId) {
+                console.log('Pay with Stripe payment method:', selectedStripePaymentMethodId);
+                // TODO: Process payment with Stripe using the payment method ID
+            } else {
+                console.log('Pay with saved card (no Stripe ID):', selectedCardId);
+            }
         } else if (selectedMethod === 'new-card') {
             router.push('/PaymentMethods');
         } else {
@@ -130,7 +147,7 @@ export default function PaymentMethodSelector({
                                 key={card.id}
                                 card={card}
                                 isSelected={selectedMethod === 'saved-card' && selectedCardId === card.id}
-                                onSelect={() => handleMethodSelect('saved-card', card.id)}
+                                onSelect={() => handleMethodSelect('saved-card', card.id, card.stripePaymentMethodId)}
                                 onDelete={() => handleDeleteCard(card.id)}
                             />
                         ))}

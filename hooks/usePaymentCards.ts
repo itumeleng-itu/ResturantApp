@@ -15,6 +15,7 @@ export function usePaymentCards() {
         card_holder: card.card_holder,
         expiry_date: `${card.expiry_month.toString().padStart(2, '0')}/${card.expiry_year.toString().slice(-2)}`,
         card_type: card.card_type || 'Card',
+        stripe_payment_method_id: card.stripe_payment_method_id,
     });
 
     const loadCards = useCallback(async () => {
@@ -57,6 +58,61 @@ export function usePaymentCards() {
         loadCards();
     }, [loadCards]);
 
+    /**
+     * Add a card with Stripe PaymentMethod ID
+     * This is the preferred method for adding cards with proper Stripe integration
+     */
+    const addCardWithStripe = async (
+        stripePaymentMethodId: string,
+        cardHolder: string,
+        last4: string,
+        brand: string,
+        expiryMonth: number,
+        expiryYear: number
+    ): Promise<boolean> => {
+        setSaving(true);
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) {
+                Alert.alert('Error', 'You must be logged in to add a card');
+                return false;
+            }
+
+            const isFirstCard = cards.length === 0;
+
+            const { error } = await supabase
+                .from('payment_cards')
+                .insert({
+                    user_id: session.user.id,
+                    card_holder: cardHolder,
+                    card_last_four: last4,
+                    card_type: brand,
+                    expiry_month: expiryMonth,
+                    expiry_year: expiryYear,
+                    is_default: isFirstCard,
+                    stripe_payment_method_id: stripePaymentMethodId,
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            await loadCards();
+            Alert.alert('Success', 'Card added successfully');
+            return true;
+        } catch (error: any) {
+            console.error('Error adding card:', error);
+            Alert.alert('Error', error.message || 'Failed to add card');
+            return false;
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    /**
+     * Legacy method for adding cards without Stripe
+     * @deprecated Use addCardWithStripe instead for proper payment processing
+     */
     const addCard = async (
         cardNumber: string,
         cardHolder: string,
@@ -138,13 +194,23 @@ export function usePaymentCards() {
         );
     };
 
+    /**
+     * Get the Stripe payment method ID for a specific card
+     */
+    const getStripePaymentMethodId = (cardId: string): string | undefined => {
+        const card = cards.find(c => c.id === cardId);
+        return card?.stripe_payment_method_id;
+    };
+
     return {
         loading,
         cards,
         saving,
         userId,
         addCard,
+        addCardWithStripe,
         confirmDeleteCard,
         refreshCards: loadCards,
+        getStripePaymentMethodId,
     };
 }

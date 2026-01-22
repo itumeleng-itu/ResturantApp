@@ -13,9 +13,9 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 // Custom hooks
 import { usePaymentCards } from '@/hooks/usePaymentCards';
 
-// Components
-import AddCardForm from '@/components/payment/AddCardForm';
+// Components - Using Stripe-integrated form
 import PaymentCardItem from '@/components/payment/PaymentCardItem';
+import StripeAddCardForm from '@/components/payment/StripeAddCardForm';
 
 export default function PaymentMethodsScreen() {
     const insets = useSafeAreaInsets();
@@ -26,17 +26,26 @@ export default function PaymentMethodsScreen() {
         loading,
         cards,
         saving,
-        addCard,
+        addCardWithStripe,
         confirmDeleteCard,
     } = usePaymentCards();
 
     const handleSaveCard = async (
-        cardNumber: string,
+        paymentMethodId: string,
         cardHolder: string,
-        expiryDate: string,
-        cardType: string
+        last4: string,
+        brand: string,
+        expiryMonth: number,
+        expiryYear: number
     ): Promise<boolean> => {
-        const success = await addCard(cardNumber, cardHolder, expiryDate, cardType);
+        const success = await addCardWithStripe(
+            paymentMethodId,
+            cardHolder,
+            last4,
+            brand,
+            expiryMonth,
+            expiryYear
+        );
         if (success) {
             setShowAddCard(false);
         }
@@ -68,6 +77,14 @@ export default function PaymentMethodsScreen() {
                 </View>
 
                 <ScrollView className="flex-1 px-6 py-6">
+                    {/* Stripe Security Badge */}
+                    <View className="flex-row items-center justify-center mb-4 py-2 px-4 bg-gray-50 rounded-lg">
+                        <Ionicons name="shield-checkmark" size={16} color="#10b981" />
+                        <Text className="text-gray-500 text-xs ml-2">
+                            Payments secured by Stripe
+                        </Text>
+                    </View>
+
                     {/* Empty State */}
                     {cards.length === 0 && !showAddCard ? (
                         <View className="items-center py-10">
@@ -85,9 +102,9 @@ export default function PaymentMethodsScreen() {
                         ))
                     )}
 
-                    {/* Add Card Form */}
+                    {/* Add Card Form (Stripe-integrated) */}
                     {showAddCard && (
-                        <AddCardForm
+                        <StripeAddCardForm
                             onSave={handleSaveCard}
                             onCancel={() => setShowAddCard(false)}
                             saving={saving}
