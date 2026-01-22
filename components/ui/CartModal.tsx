@@ -87,9 +87,8 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
         }
         
         // User IS logged in - proceed to checkout
-        Alert.alert('Checkout', 'Proceeding to checkout...');
         onClose();
-        //router.push('/checkout'); // Navigate to checkout screen
+        router.push('/checkout'); // Navigate to checkout screen
     };
 
     // Handle quantity change

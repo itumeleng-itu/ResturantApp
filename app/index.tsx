@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { useAudioPlayer } from 'expo-audio';
 import { useRouter } from "expo-router";
 import LottieView from 'lottie-react-native';
 import { useEffect, useRef } from 'react';
@@ -9,58 +9,44 @@ export default function Landing() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const animationRef = useRef<LottieView>(null);
-  const soundRef = useRef<Audio.Sound | null>(null);
   const fadeIntervalRef = useRef<number | null>(null);
+  
+  // Use the new expo-audio hook - player is auto-managed
+  const player = useAudioPlayer(require('../assets/sounds/ambience.mp3'));
 
   useEffect(() => {
-    // Play splash sound with fade out effect
-    const playSound = async () => {
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          require('../assets/sounds/ambience.mp3'),
-          { shouldPlay: true, volume: 1.0 } // Start at full volume
-        );
-        soundRef.current = sound;
+    // Set volume to 100% and start playing
+    player.volume = 1.0;
+    player.play();
 
-        // Fade out the sound over the animation duration (6.5 seconds)
-        let currentVolume = 1.0;
-        const fadeSteps = 13; // Number of fade steps
-        const fadeInterval = 6500 / fadeSteps; // ~500ms per step
-        const volumeDecrement = 1.0 / fadeSteps;
+    // Fade out the sound over the animation duration (6.5 seconds)
+    let currentVolume = 1.0;
+    const fadeSteps = 13; // Number of fade steps
+    const fadeInterval = 6500 / fadeSteps; // ~500ms per step
+    const volumeDecrement = 1.0 / fadeSteps;
 
-        fadeIntervalRef.current = setInterval(async () => {
-          currentVolume -= volumeDecrement;
-          if (currentVolume <= 0) {
-            currentVolume = 0;
-            if (fadeIntervalRef.current) {
-              clearInterval(fadeIntervalRef.current);
-            }
-          }
-          if (soundRef.current) {
-            await soundRef.current.setVolumeAsync(Math.max(0, currentVolume));
-          }
-        }, fadeInterval);
-
-      } catch (error) {
-        console.log('Could not play splash sound:', error);
+    fadeIntervalRef.current = setInterval(() => {
+      currentVolume -= volumeDecrement;
+      if (currentVolume <= 0) {
+        currentVolume = 0;
+        if (fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current);
+        }
       }
-    };
-
-    playSound();
+      player.volume = Math.max(0, currentVolume);
+    }, fadeInterval);
 
     // Animation duration: navigate after animation completes
     const timer = setTimeout(() => {
       router.replace('/(tabs)/home'); 
     }, 6500);
 
-    // Cleanup timer, sound, and fade interval on unmount
+    // Cleanup timer and fade interval on unmount
+    // Note: player cleanup is automatic with useAudioPlayer hook
     return () => {
       clearTimeout(timer);
       if (fadeIntervalRef.current) {
         clearInterval(fadeIntervalRef.current);
-      }
-      if (soundRef.current) {
-        soundRef.current.unloadAsync();
       }
     };
   }, []);

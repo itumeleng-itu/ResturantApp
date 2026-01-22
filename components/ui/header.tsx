@@ -56,7 +56,7 @@ export default function Header (){
 
     return(
         <>
-            <View className="flex-row items-center px-6 py-2 justify-between">
+            <View className="flex-row items-center border-b border-black/5 px-6 py-2 justify-between">
                 <View className="flex-row items-center gap-2">
                     <MaterialIcons name="delivery-dining" size={44} color="black" />
                     <View>
