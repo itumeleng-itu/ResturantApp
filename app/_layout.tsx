@@ -23,6 +23,11 @@ export default function RootLayout() {
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
           <Stack.Screen name='SignIn' options={{headerShown: false}}/>
           <Stack.Screen name='SignUp' options={{headerShown: false}}/>
+          <Stack.Screen name='EditProfile' options={{headerShown: false}}/>
+          <Stack.Screen name='PaymentMethods' options={{headerShown: false}}/>
+          <Stack.Screen name='HelpSupport' options={{headerShown: false}}/>
+          <Stack.Screen name='About' options={{headerShown: false}}/>
+          <Stack.Screen name='DeliveryAddresses' options={{headerShown: false}}/>
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>

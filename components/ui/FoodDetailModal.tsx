@@ -19,6 +19,7 @@ export type FoodItem = {
   is_available?: boolean;
   is_spicy?: boolean;
   category?: string;
+  category_name?: string;
 };
 
 type FoodDetailModalProps = {

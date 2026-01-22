@@ -1,6 +1,7 @@
 //libraries
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
 //hooks
@@ -9,6 +10,9 @@ import { useRouter } from "expo-router";
 
 //components
 import CartModal from "./CartModal";
+
+// Services
+import { supabase } from '@/lib/supabase';
 
 
 export default function Header (){
@@ -22,6 +26,33 @@ export default function Header (){
     
     // Cart modal state
     const [cartModalVisible, setCartModalVisible] = useState(false);
+    const [address, setAddress] = useState('40a Thabo Mbeki, 0700');
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchDefaultAddress();
+        }, [])
+    );
+
+    const fetchDefaultAddress = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                const { data, error } = await supabase
+                    .from('addresses')
+                    .select('street, postal_code')
+                    .eq('user_id', session.user.id)
+                    .eq('is_default', true)
+                    .single();
+
+                if (data && !error) {
+                    setAddress(`${data.street}, ${data.postal_code}`);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching default address:', error);
+        }
+    };
 
     return(
         <>
@@ -30,7 +61,7 @@ export default function Header (){
                     <MaterialIcons name="delivery-dining" size={44} color="black" />
                     <View>
                         <Text className="text-gray-400 text-[10px]">Delivery to</Text>
-                        <Text className="text-black text-md font-bold">40a Thabo Mbeki, 0700</Text>
+                        <Text className="text-black text-md font-bold">{address}</Text>
                     </View>
                 </View>
                 <View className="flex-row gap-4">

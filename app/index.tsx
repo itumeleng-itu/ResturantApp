@@ -1,3 +1,4 @@
+import { Audio } from 'expo-av';
 import { useRouter } from "expo-router";
 import LottieView from 'lottie-react-native';
 import { useEffect, useRef } from 'react';
@@ -8,15 +9,60 @@ export default function Landing() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const animationRef = useRef<LottieView>(null);
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const fadeIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    // Animation duration: 240 frames ÷ 30 fps = 8000ms
+    // Play splash sound with fade out effect
+    const playSound = async () => {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/sounds/ambience.mp3'),
+          { shouldPlay: true, volume: 1.0 } // Start at full volume
+        );
+        soundRef.current = sound;
+
+        // Fade out the sound over the animation duration (6.5 seconds)
+        let currentVolume = 1.0;
+        const fadeSteps = 13; // Number of fade steps
+        const fadeInterval = 6500 / fadeSteps; // ~500ms per step
+        const volumeDecrement = 1.0 / fadeSteps;
+
+        fadeIntervalRef.current = setInterval(async () => {
+          currentVolume -= volumeDecrement;
+          if (currentVolume <= 0) {
+            currentVolume = 0;
+            if (fadeIntervalRef.current) {
+              clearInterval(fadeIntervalRef.current);
+            }
+          }
+          if (soundRef.current) {
+            await soundRef.current.setVolumeAsync(Math.max(0, currentVolume));
+          }
+        }, fadeInterval);
+
+      } catch (error) {
+        console.log('Could not play splash sound:', error);
+      }
+    };
+
+    playSound();
+
+    // Animation duration: navigate after animation completes
     const timer = setTimeout(() => {
       router.replace('/(tabs)/home'); 
     }, 6500);
 
-    // Cleanup timer on unmount
-    return () => clearTimeout(timer);
+    // Cleanup timer, sound, and fade interval on unmount
+    return () => {
+      clearTimeout(timer);
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+      }
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
   }, []);
 
   return (
@@ -51,3 +97,4 @@ export default function Landing() {
     </View>
   );
 }
+

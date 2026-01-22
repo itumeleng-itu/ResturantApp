@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -34,10 +34,12 @@ export default function ProfileScreen() {
     const [loading, setLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // Check auth and load profile on mount
-    useEffect(() => {
-        checkAuthAndLoadProfile();
-    }, []);
+    // Refresh profile on focus
+    useFocusEffect(
+        useCallback(() => {
+            checkAuthAndLoadProfile();
+        }, [])
+    );
 
     const checkAuthAndLoadProfile = async () => {
         setLoading(true);
@@ -197,7 +199,10 @@ export default function ProfileScreen() {
                     <Text className="text-gray-400 mt-1">{profile?.email}</Text>
                     
                     {/* Edit Profile Button */}
-                    <TouchableOpacity className="mt-4 border border-gray-300 px-6 py-2 rounded-full">
+                    <TouchableOpacity 
+                        onPress={() => router.push('/EditProfile')}
+                        className="mt-4 border border-gray-300 px-6 py-2 rounded-full"
+                    >
                         <Text className="text-gray-600 font-medium">Edit Profile</Text>
                     </TouchableOpacity>
                 </View>
@@ -210,19 +215,19 @@ export default function ProfileScreen() {
                         icon="person-outline" 
                         title="Personal Information"
                         subtitle="Name, email, phone"
-                        onPress={() => {}}
+                        onPress={() => router.push('/EditProfile')}
                     />
                     <MenuItem 
                         icon="location-on" 
                         title="Delivery Addresses"
                         subtitle="Manage your addresses"
-                        onPress={() => {}}
+                        onPress={() => router.push('/DeliveryAddresses')}
                     />
                     <MenuItem 
                         icon="credit-card" 
                         title="Payment Methods"
                         subtitle="Cards and payment options"
-                        onPress={() => {}}
+                        onPress={() => router.push('/PaymentMethods')}
                     />
                 </View>
 
@@ -255,12 +260,12 @@ export default function ProfileScreen() {
                     <MenuItem 
                         icon="help-outline" 
                         title="Help & Support"
-                        onPress={() => {}}
+                        onPress={() => router.push('/HelpSupport')}
                     />
                     <MenuItem 
                         icon="info-outline" 
                         title="About"
-                        onPress={() => {}}
+                        onPress={() => router.push('/About')}
                     />
                 </View>
 

@@ -1,18 +1,20 @@
 //libraries
-import { Text, View, ScrollView} from "react-native";
+import React, { useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 
 //hooks
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 //components
-import SearchNFilter from "@/components/ui/searchNfilter";
 import CircularCategories from "@/components/ui/circularCategories";
 import FoodGrids from "@/components/ui/foodGrids";
 import Header from "@/components/ui/header";
+import SearchNFilter from "@/components/ui/searchNfilter";
 
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const [activeCategory, setActiveCategory] = useState('All');
     
   return (
     <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
@@ -33,10 +35,13 @@ export default function HomeScreen() {
         <SearchNFilter/>
 
         {/*categiries*/}
-        <CircularCategories/>
+        <CircularCategories 
+          activeCategory={activeCategory} 
+          onCategoryChange={setActiveCategory} 
+        />
 
         {/*food grid */}
-        <FoodGrids/>
+        <FoodGrids selectedCategory={activeCategory} />
         
       </ScrollView>
     </View>

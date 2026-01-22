@@ -1,15 +1,19 @@
-import {View,TextInput,Text, TouchableOpacity,ScrollView} from "react-native";
-import { MaterialIcons} from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 //hook
 import { useGetData } from "@/hooks/useGetData";
 
 
-export default function CircularCategories() {
-    const [activeCategory, setActiveCategory] = useState('All');
+type CircularCategoriesProps = {
+    activeCategory: string;
+    onCategoryChange: (category: string) => void;
+};
+
+export default function CircularCategories({ activeCategory, onCategoryChange }: CircularCategoriesProps) {
     const [categories, setCategories] = useState<any[]>([]);
-    const {getCategories} = useGetData()
+    const { getCategories } = useGetData();
 
     // Icon mapping based on category name
     const getIconForCategory = (categoryName: string): any => {
@@ -21,7 +25,6 @@ export default function CircularCategories() {
             'beverages': 'local-drink',
             'starters': 'restaurant',
             'salads': 'eco',
-            
         };
         return iconMap[categoryName.toLowerCase()] || 'restaurant-menu';
     };
@@ -33,7 +36,13 @@ export default function CircularCategories() {
     const loadData = async () => {
         const data = await getCategories();
         if (data) {
-            setCategories(data);
+            // Ensure 'All' is in the categories if not present
+            const hasAll = data.some((c: any) => c.name.toLowerCase() === 'all');
+            if (hasAll) {
+                setCategories(data);
+            } else {
+                setCategories([{ id: 'all-id', name: 'All' }, ...data]);
+            }
         }
     };
     
@@ -45,7 +54,7 @@ export default function CircularCategories() {
                 return (
                 <TouchableOpacity 
                     key={category.id} 
-                    onPress={() => setActiveCategory(category.name)}
+                    onPress={() => onCategoryChange(category.name)}
                     className="items-center mr-8"
                 >
                     <View 
