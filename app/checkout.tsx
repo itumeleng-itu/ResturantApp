@@ -13,6 +13,8 @@ import {
 } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import PaymentMethodSelector from '@/components/ui/paymentMethods';
+
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/lib/supabase';
 
@@ -139,7 +141,7 @@ export default function CheckoutScreen() {
                 setPaymentLoading(false);
                 clearCart();
                 Alert.alert(
-                    'Order Placed! 🎉',
+                    'Order Placed!',
                     'Your order has been placed successfully. You will receive a confirmation shortly.',
                     [
                         {
@@ -154,7 +156,6 @@ export default function CheckoutScreen() {
             console.error('Payment error:', error);
             Alert.alert('Error', 'Something went wrong. Please try again.');
         } finally {
-            // setPaymentLoading(false); // Commented out for simulated flow
         }
     };
 
@@ -248,6 +249,11 @@ export default function CheckoutScreen() {
                                 <Text className="text-gray-400 mt-2">Your cart is empty</Text>
                             </View>
                         )}
+                    </View>
+
+                    {/* Select payment methods */}
+                    <View className="bg-white mx-4 mt-4 rounded-2xl p-4">
+                        <PaymentMethodSelector />
                     </View>
 
                     {/* Payment Summary Section */}
