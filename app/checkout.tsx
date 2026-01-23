@@ -6,6 +6,7 @@ import {
     Alert,
     ScrollView,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -30,12 +31,14 @@ import {
     usePaymentProcessing,
     usePaymentSelection,
 } from '@/hooks/useCheckout';
+import { supabase } from '@/lib/supabase';
 
 export default function CheckoutScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { cartItems, cartTotal, clearCart } = useCart();
     const [isSuccess, setIsSuccess] = useState(false);
+    const [orderNotes, setOrderNotes] = useState('');
     
     // Custom hooks for checkout logic
     const { loading, selectedAddress } = useCheckoutAddresses();
@@ -79,6 +82,7 @@ export default function CheckoutScreen() {
 
         try {
             let paymentSuccess = false;
+            let cardLastFour = 'N/A';
 
             // Process payment based on selected method
             switch (selectedPayment.method) {
@@ -92,14 +96,18 @@ export default function CheckoutScreen() {
                         selectedPayment.stripePaymentMethodId,
                         totalWithDelivery
                     );
+                    // Get card last 4 digits (we'll need to pass this from the payment selector)
+                    cardLastFour = selectedPayment.cardLast4 || '****';
                     break;
 
                 case 'cash':
                     paymentSuccess = await processCashPayment();
+                    cardLastFour = 'Cash';
                     break;
 
                 case 'wallet':
                     paymentSuccess = await processWalletPayment();
+                    cardLastFour = 'Wallet';
                     break;
 
                 default:
@@ -109,19 +117,46 @@ export default function CheckoutScreen() {
             }
 
             if (paymentSuccess) {
-                // Create order in database
-                await createOrder(
-                    selectedAddress.id,
-                    cartItems,
-                    cartTotal,
-                    deliveryFee,
-                    totalWithDelivery,
-                    selectedPayment.method,
-                    selectedPayment.stripePaymentMethodId
-                );
+                // Get user session for user info
+                const { data: { session } } = await supabase.auth.getSession();
                 
-                clearCart();
-                setIsSuccess(true);
+                if (!session?.user) {
+                    Alert.alert('Error', 'Session expired. Please sign in again.');
+                    setPaymentLoading(false);
+                    return;
+                }
+
+                // Get user metadata
+                const userMeta = session.user.user_metadata || {};
+                
+                // Create order in database with all required fields
+                const orderSuccess = await createOrder({
+                    // User info
+                    userName: userMeta.full_name || userMeta.name || 'Customer',
+                    userSurname: userMeta.last_name || '',
+                    userEmail: session.user.email || '',
+                    userContact: userMeta.phone || userMeta.phone_number || '',
+                    // Delivery address from selected address
+                    deliveryStreet: selectedAddress.street,
+                    deliveryCity: selectedAddress.city,
+                    deliveryPostalCode: selectedAddress.postal_code,
+                    // Payment info
+                    cardLastFour: cardLastFour,
+                    paymentMethod: selectedPayment.method,
+                    // Order totals
+                    subtotal: cartTotal,
+                    deliveryFee: deliveryFee,
+                    total: totalWithDelivery,
+                    // Notes
+                    notes: orderNotes.trim() || undefined,
+                });
+
+                if (orderSuccess) {
+                    clearCart();
+                    setIsSuccess(true);
+                } else {
+                    Alert.alert('Error', 'Failed to create order. Please try again.');
+                }
             }
         } catch (error) {
             console.error('Payment error:', error);
@@ -196,6 +231,24 @@ export default function CheckoutScreen() {
                         deliveryFee={deliveryFee}
                         total={totalWithDelivery}
                     />
+
+                    {/* Order Notes Section */}
+                    <View className="bg-white mx-4 mt-4 rounded-2xl p-4">
+                        <Text className="text-lg font-bold mb-3">Order Notes</Text>
+                        <TextInput
+                            className="bg-gray-50 rounded-xl p-4 min-h-[100px] text-gray-700"
+                            placeholder="Add any special instructions for your order (e.g., no onions, extra spicy, ring doorbell...)"
+                            placeholderTextColor="#9ca3af"
+                            value={orderNotes}
+                            onChangeText={setOrderNotes}
+                            multiline
+                            textAlignVertical="top"
+                            maxLength={500}
+                        />
+                        <Text className="text-gray-400 text-xs text-right mt-2">
+                            {orderNotes.length}/500
+                        </Text>
+                    </View>
 
                     {/* Spacer for bottom button */}
                     <View className="h-24" />

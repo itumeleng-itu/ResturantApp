@@ -64,12 +64,14 @@ export function usePaymentSelection() {
     const handlePaymentMethodSelect = useCallback((
         method: PaymentMethod,
         cardId?: string,
-        stripePaymentMethodId?: string
+        stripePaymentMethodId?: string,
+        cardLast4?: string
     ) => {
         setSelectedPayment({
             method,
             cardId,
             stripePaymentMethodId,
+            cardLast4,
         });
     }, []);
 
@@ -180,45 +182,74 @@ export function usePaymentProcessing() {
     };
 
     /**
-     * Create order in database
+     * Order data interface matching the database schema
      */
-    const createOrder = async (
-        addressId: string,
-        cartItems: any[],
-        cartTotal: number,
-        deliveryFee: number,
-        totalWithDelivery: number,
-        paymentMethod: PaymentMethod,
-        stripePaymentMethodId?: string,
-        stripePaymentIntentId?: string
-    ): Promise<boolean> => {
+    interface OrderData {
+        // User info
+        userName: string;
+        userSurname: string;
+        userEmail: string;
+        userContact: string;
+        // Delivery address
+        deliveryStreet: string;
+        deliveryCity: string;
+        deliveryPostalCode: string;
+        // Payment info
+        cardLastFour: string;
+        paymentMethod: PaymentMethod;
+        // Order totals
+        subtotal: number;
+        deliveryFee: number;
+        total: number;
+        // Optional
+        notes?: string;
+    }
+
+    /**
+     * Create order in database
+     * Matches the orders table schema
+     */
+    const createOrder = async (orderData: OrderData): Promise<boolean> => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) return false;
 
-            // TODO: Create order in your orders table
-            // const { data, error } = await supabase
-            //     .from('orders')
-            //     .insert({
-            //         user_id: session.user.id,
-            //         address_id: addressId,
-            //         items: cartItems,
-            //         subtotal: cartTotal,
-            //         delivery_fee: deliveryFee,
-            //         total: totalWithDelivery,
-            //         payment_method: paymentMethod,
-            //         stripe_payment_method_id: stripePaymentMethodId,
-            //         stripe_payment_intent_id: stripePaymentIntentId,
-            //         status: paymentMethod === 'cash' ? 'pending_payment' : 'paid',
-            //     });
+            // Determine payment status based on payment method
+            const paymentStatus = orderData.paymentMethod === 'cash' ? 'pending' : 'paid';
 
-            console.log('Order created successfully');
+            const { data, error } = await supabase
+                .from('orders')
+                .insert({
+                    user_id: session.user.id,
+                    user_name: orderData.userName,
+                    user_surname: orderData.userSurname,
+                    user_email: orderData.userEmail,
+                    user_contact: orderData.userContact,
+                    delivery_street: orderData.deliveryStreet,
+                    delivery_city: orderData.deliveryCity,
+                    delivery_postal_code: orderData.deliveryPostalCode,
+                    card_last_four: orderData.cardLastFour,
+                    subtotal: orderData.subtotal,
+                    delivery_fee: orderData.deliveryFee,
+                    total: orderData.total,
+                    status: 'pending',
+                    payment_status: paymentStatus,
+                    notes: orderData.notes || null,
+                })
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            console.log('Order created successfully:', data?.id);
             return true;
         } catch (error) {
             console.error('Error creating order:', error);
             return false;
         }
     };
+
+
 
     return {
         paymentLoading,

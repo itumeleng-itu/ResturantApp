@@ -23,6 +23,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@stripe/stripe-react-native": "^0.50.3",
     "@supabase/supabase-js": "^2.90.1",
+    "date-fns": "^4.1.0",
     "expo": "~54.0.31",
     "expo-audio": "^1.1.1",
     "expo-av": "~16.0.8",

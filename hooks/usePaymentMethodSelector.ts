@@ -18,7 +18,7 @@ type UsePaymentMethodSelectorReturn = {
 };
 
 export function usePaymentMethodSelector(
-    onMethodSelect?: (method: PaymentMethod, cardId?: string, stripePaymentMethodId?: string) => void
+    onMethodSelect?: (method: PaymentMethod, cardId?: string, stripePaymentMethodId?: string, cardLast4?: string) => void
 ): UsePaymentMethodSelectorReturn {
     const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
     const [selectedCard, setSelectedCard] = useState<Card | null>(null);
@@ -62,7 +62,7 @@ export function usePaymentMethodSelector(
                     setSelectedCard(defaultCard);
                     setSelectedMethod('saved-card');
                     if (onMethodSelect) {
-                        onMethodSelect('saved-card', defaultCard.id, defaultCard.stripePaymentMethodId);
+                        onMethodSelect('saved-card', defaultCard.id, defaultCard.stripePaymentMethodId, defaultCard.last4);
                     }
                 }
             }
@@ -84,7 +84,7 @@ export function usePaymentMethodSelector(
         setShowCardSelector(false);
 
         if (onMethodSelect) {
-            onMethodSelect(method, card?.id, card?.stripePaymentMethodId);
+            onMethodSelect(method, card?.id, card?.stripePaymentMethodId, card?.last4);
         }
     }, [onMethodSelect]);
 

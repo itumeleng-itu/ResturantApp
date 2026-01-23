@@ -14,6 +14,7 @@ export type SelectedPaymentInfo = {
     method: PaymentMethod;
     cardId?: string;
     stripePaymentMethodId?: string;
+    cardLast4?: string;
 };
 
 export type CartItem = {

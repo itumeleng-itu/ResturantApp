@@ -1,6 +1,6 @@
 // Supabase Edge Function: create-payment-intent
 // Save this as: supabase/functions/create-payment-intent/index.ts
-// Deploy with: npx supabase functions deploy create-payment-intent --project-ref ygvncynjmwnbjztuydmo
+// Deploy with: npx supabase functions deploy create-payment-intent --project-ref ygvncynjmwnbjztuydmo --no-verify-jwt
 
 // Deno type declarations for local TypeScript support
 declare const Deno: {
@@ -16,6 +16,103 @@ const corsHeaders = {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+// Helper function to make Stripe API calls
+async function stripeRequest(
+    endpoint: string,
+    method: string,
+    stripeSecretKey: string,
+    body?: Record<string, string>
+): Promise<any> {
+    const response = await fetch(`https://api.stripe.com/v1${endpoint}`, {
+        method,
+        headers: {
+            'Authorization': `Bearer ${stripeSecretKey}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: body ? new URLSearchParams(body).toString() : undefined,
+    });
+    return response.json();
+}
+
+// Find or create a Stripe Customer by email
+async function getOrCreateCustomer(
+    email: string,
+    stripeSecretKey: string
+): Promise<{ id: string } | null> {
+    console.log('🔍 Looking for existing customer with email:', email);
+
+    // Search for existing customer
+    const searchResult = await stripeRequest(
+        `/customers?email=${encodeURIComponent(email)}&limit=1`,
+        'GET',
+        stripeSecretKey
+    );
+
+    if (searchResult.data && searchResult.data.length > 0) {
+        console.log('✅ Found existing customer:', searchResult.data[0].id);
+        return { id: searchResult.data[0].id };
+    }
+
+    // Create new customer
+    console.log('📝 Creating new Stripe customer...');
+    const newCustomer = await stripeRequest(
+        '/customers',
+        'POST',
+        stripeSecretKey,
+        { email }
+    );
+
+    if (newCustomer.id) {
+        console.log('✅ Created new customer:', newCustomer.id);
+        return { id: newCustomer.id };
+    }
+
+    console.error('❌ Failed to create customer:', newCustomer.error?.message);
+    return null;
+}
+
+// Attach PaymentMethod to Customer (if not already attached)
+async function attachPaymentMethodToCustomer(
+    paymentMethodId: string,
+    customerId: string,
+    stripeSecretKey: string
+): Promise<boolean> {
+    console.log('🔗 Attaching payment method to customer...');
+
+    // First, check if already attached
+    const pm = await stripeRequest(
+        `/payment_methods/${paymentMethodId}`,
+        'GET',
+        stripeSecretKey
+    );
+
+    if (pm.customer === customerId) {
+        console.log('✅ Payment method already attached to this customer');
+        return true;
+    }
+
+    if (pm.customer && pm.customer !== customerId) {
+        console.log('⚠️ Payment method attached to different customer, cannot reuse');
+        return false;
+    }
+
+    // Attach to customer
+    const attachResult = await stripeRequest(
+        `/payment_methods/${paymentMethodId}/attach`,
+        'POST',
+        stripeSecretKey,
+        { customer: customerId }
+    );
+
+    if (attachResult.id) {
+        console.log('✅ Payment method attached successfully');
+        return true;
+    }
+
+    console.error('❌ Failed to attach payment method:', attachResult.error?.message);
+    return false;
+}
+
 Deno.serve(async (req: Request) => {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -25,13 +122,6 @@ Deno.serve(async (req: Request) => {
     try {
         // ✅ Get the Stripe secret key from environment
         const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
-
-        // ✅ IMPORTANT: Log key info for debugging
-        console.log('=== STRIPE KEY CHECK ===');
-        console.log('Key exists:', !!stripeSecretKey);
-        console.log('Key length:', stripeSecretKey?.length || 0);
-        console.log('Key starts with:', stripeSecretKey?.slice(0, 15) || 'N/A');
-        console.log('========================');
 
         if (!stripeSecretKey) {
             console.error('❌ STRIPE_SECRET_KEY not found in environment');
@@ -53,13 +143,10 @@ Deno.serve(async (req: Request) => {
 
         if (!isValidKey) {
             console.error('❌ Invalid Stripe key format!');
-            console.error('Key does not start with sk_test_ or sk_live_');
-            console.error('Key starts with:', stripeSecretKey.slice(0, 15));
-
             return new Response(
                 JSON.stringify({
                     success: false,
-                    error: 'Invalid Stripe key configuration. Please check server environment variables.'
+                    error: 'Invalid Stripe key configuration.'
                 }),
                 {
                     status: 500,
@@ -71,8 +158,8 @@ Deno.serve(async (req: Request) => {
         console.log('✅ Stripe key format is valid');
 
         // ✅ Parse request body
-        const { amount, currency, paymentMethodId } = await req.json();
-        console.log('📝 Payment request:', { amount, currency, paymentMethodId });
+        const { amount, currency, paymentMethodId, email } = await req.json();
+        console.log('📝 Payment request:', { amount, currency, paymentMethodId, email });
 
         // ✅ Validate required fields
         if (!amount || !paymentMethodId) {
@@ -104,41 +191,71 @@ Deno.serve(async (req: Request) => {
             );
         }
 
-        console.log('✅ Validation passed, calling Stripe API...');
+        console.log('✅ Validation passed');
 
-        // ✅ Create PaymentIntent using Stripe REST API directly
-        const response = await fetch('https://api.stripe.com/v1/payment_intents', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${stripeSecretKey}`,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                'amount': String(Math.round(amount)),
-                'currency': currency || 'zar',
-                'payment_method': paymentMethodId,
-                'confirm': 'true',
-                'automatic_payment_methods[enabled]': 'true',
-                'automatic_payment_methods[allow_redirects]': 'never',
-            }).toString(),
-        });
+        // ✅ Get or create Stripe Customer (required for reusable payment methods)
+        let customerId: string | undefined;
 
-        console.log('📡 Stripe API response status:', response.status);
+        if (email) {
+            const customer = await getOrCreateCustomer(email, stripeSecretKey);
+            if (customer) {
+                customerId = customer.id;
 
-        const paymentIntent = await response.json();
+                // Attach payment method to customer
+                const attached = await attachPaymentMethodToCustomer(
+                    paymentMethodId,
+                    customerId,
+                    stripeSecretKey
+                );
 
-        // Log response (but hide sensitive data)
+                if (!attached) {
+                    return new Response(
+                        JSON.stringify({
+                            success: false,
+                            error: 'Unable to use this payment method. Please add a new card.'
+                        }),
+                        {
+                            status: 400,
+                            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+                        }
+                    );
+                }
+            }
+        }
+
+        console.log('💳 Creating PaymentIntent...');
+
+        // ✅ Build PaymentIntent params
+        const paymentIntentParams: Record<string, string> = {
+            'amount': String(Math.round(amount)),
+            'currency': currency || 'zar',
+            'payment_method': paymentMethodId,
+            'confirm': 'true',
+            'automatic_payment_methods[enabled]': 'true',
+            'automatic_payment_methods[allow_redirects]': 'never',
+        };
+
+        // Add customer if we have one
+        if (customerId) {
+            paymentIntentParams['customer'] = customerId;
+        }
+
+        // ✅ Create PaymentIntent
+        const paymentIntent = await stripeRequest(
+            '/payment_intents',
+            'POST',
+            stripeSecretKey,
+            paymentIntentParams
+        );
+
         console.log('📡 Stripe response received');
         console.log('Payment Intent ID:', paymentIntent.id || 'N/A');
         console.log('Status:', paymentIntent.status || 'N/A');
-        console.log('Has error:', !!paymentIntent.error);
 
         // ✅ Check for Stripe errors
         if (paymentIntent.error) {
             const error = paymentIntent.error;
             console.error('❌ Stripe error:', error.message);
-            console.error('Error type:', error.type);
-            console.error('Error code:', error.code);
 
             return new Response(
                 JSON.stringify({
@@ -158,7 +275,6 @@ Deno.serve(async (req: Request) => {
         // ✅ Check payment status
         if (paymentIntent.status === 'succeeded') {
             console.log('✅ Payment succeeded!');
-            console.log('Payment Intent ID:', paymentIntent.id);
 
             return new Response(
                 JSON.stringify({
@@ -205,13 +321,11 @@ Deno.serve(async (req: Request) => {
     } catch (error: any) {
         console.error('❌ Function error:', error);
         console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
 
         return new Response(
             JSON.stringify({
                 success: false,
                 error: error.message || 'An unexpected error occurred',
-                details: error.toString(),
             }),
             {
                 status: 500,

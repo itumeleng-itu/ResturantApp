@@ -1,6 +1,6 @@
 import { Order } from '@/types/order';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { format } from 'date-fns';
-import { AlertCircle, CheckCircle2, ChevronRight, Clock, ShoppingBag, Truck } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -12,23 +12,23 @@ interface OrderCardProps {
 const getStatusConfig = (status: string) => {
   switch (status) {
     case 'pending':
-      return { color: '#EAB308', icon: Clock, label: 'Pending' };
+      return { color: '#EAB308', icon: 'time-outline', library: 'Ionicons', label: 'Pending' };
     case 'preparing':
-      return { color: '#3B82F6', icon: ShoppingBag, label: 'Preparing' };
-    case 'on_the_way':
-      return { color: '#8B5CF6', icon: Truck, label: 'On the way' };
+      return { color: '#3B82F6', icon: 'restaurant-outline', library: 'Ionicons', label: 'Preparing' };
+    case 'out_for_delivery':
+      return { color: '#8B5CF6', icon: 'bicycle-outline', library: 'Ionicons', label: 'On the way' };
     case 'delivered':
-      return { color: '#10B981', icon: CheckCircle2, label: 'Delivered' };
+      return { color: '#10B981', icon: 'checkmark-circle-outline', library: 'Ionicons', label: 'Delivered' };
     case 'cancelled':
-      return { color: '#EF4444', icon: AlertCircle, label: 'Cancelled' };
+      return { color: '#EF4444', icon: 'close-circle-outline', library: 'Ionicons', label: 'Cancelled' };
     default:
-      return { color: '#6B7280', icon: Clock, label: status };
+      return { color: '#6B7280', icon: 'help-circle-outline', library: 'Ionicons', label: status };
   }
 };
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress }) => {
   const statusConfig = getStatusConfig(order.status);
-  const StatusIcon = statusConfig.icon;
+  const IconComponent = statusConfig.library === 'Ionicons' ? Ionicons : MaterialIcons;
   
   const formattedDate = format(new Date(order.created_at), 'MMM d, h:mm a');
 
@@ -40,7 +40,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress }) => {
     >
       <View style={styles.header}>
         <View style={styles.statusBadge}>
-          <StatusIcon size={14} color={statusConfig.color} />
+          <IconComponent name={statusConfig.icon as any} size={14} color={statusConfig.color} />
           <Text style={[styles.statusText, { color: statusConfig.color }]}>
             {statusConfig.label}
           </Text>
@@ -51,7 +51,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress }) => {
       <View style={styles.content}>
         <View style={styles.infoRow}>
           <Text style={styles.orderId}>Order #{order.id.slice(0, 8).toUpperCase()}</Text>
-          <Text style={styles.amount}>R {order.total_amount.toFixed(2)}</Text>
+          <Text style={styles.amount}>R {(order.total ?? 0).toFixed(2)}</Text>
         </View>
         
         <Text style={styles.itemsCount}>
@@ -61,7 +61,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onPress }) => {
 
       <View style={styles.footer}>
         <Text style={styles.viewDetails}>View Details</Text>
-        <ChevronRight size={16} color="#9CA3AF" />
+        <MaterialIcons name="chevron-right" size={16} color="#9CA3AF" />
       </View>
     </TouchableOpacity>
   );

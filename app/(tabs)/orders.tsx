@@ -1,16 +1,16 @@
 import { OrderCard } from '@/components/orders/OrderCard';
 import { useOrders } from '@/hooks/useOrders';
 import { Order } from '@/types/order';
-import { History, PackageOpen, ShoppingBag } from 'lucide-react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -28,7 +28,7 @@ export default function OrdersScreen() {
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <View style={styles.emptyIconContainer}>
-        <PackageOpen size={48} color="#D1D5DB" />
+        <MaterialIcons name="inventory" size={48} color="#D1D5DB" />
       </View>
       <Text style={styles.emptyTitle}>No orders yet</Text>
       <Text style={styles.emptySubtitle}>
@@ -56,7 +56,7 @@ export default function OrdersScreen() {
           style={[styles.tab, activeTab === 'active' && styles.activeTab]}
           onPress={() => setActiveTab('active')}
         >
-          <ShoppingBag size={18} color={activeTab === 'active' ? '#E11D48' : '#9CA3AF'} />
+          <MaterialIcons name="shopping-bag" size={20} color={activeTab === 'active' ? '#E11D48' : '#9CA3AF'} />
           <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
             Active
           </Text>
@@ -71,7 +71,7 @@ export default function OrdersScreen() {
           style={[styles.tab, activeTab === 'history' && styles.activeTab]}
           onPress={() => setActiveTab('history')}
         >
-          <History size={18} color={activeTab === 'history' ? '#E11D48' : '#9CA3AF'} />
+          <MaterialIcons name="history" size={20} color={activeTab === 'history' ? '#E11D48' : '#9CA3AF'} />
           <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
             History
           </Text>
@@ -90,8 +90,13 @@ export default function OrdersScreen() {
             <OrderCard order={item} onPress={handleOrderPress} />
           )}
           contentContainerStyle={styles.listContent}
-          RefreshControl={
-            <RefreshControl refreshing={loading} onRefresh={refreshOrders} color="#E11D48" />
+          refreshControl={
+            <RefreshControl 
+              refreshing={loading} 
+              onRefresh={refreshOrders} 
+              colors={['#E11D48']} // Android
+              tintColor="#E11D48" // iOS
+            />
           }
           ListEmptyComponent={renderEmptyState}
         />

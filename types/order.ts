@@ -1,16 +1,26 @@
-export type OrderStatus = 'pending' | 'preparing' | 'on_the_way' | 'delivered' | 'cancelled';
+export type OrderStatus = 'pending' | 'preparing' | 'out_for_delivery' | 'delivered' | 'cancelled';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface Order {
     id: string;
     user_id: string;
-    created_at: string;
-    total_amount: number;
-    status: OrderStatus;
-    payment_method: string;
-    payment_status: string;
-    address_id: string;
+    user_name: string;
+    user_surname: string;
+    user_email: string;
+    user_contact: string;
+    delivery_street: string;
+    delivery_city: string;
+    delivery_postal_code: string;
+    card_last_four: string;
+    subtotal: number;
     delivery_fee: number;
-    items_count?: number;
+    total: number;
+    status: OrderStatus;
+    payment_status: PaymentStatus;
+    notes?: string | null;
+    created_at: string;
+    updated_at: string;
+    items_count?: number; // Computed from join
 }
 
 export interface OrderItem {

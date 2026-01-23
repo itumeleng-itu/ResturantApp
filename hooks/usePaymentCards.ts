@@ -60,7 +60,7 @@ export function usePaymentCards() {
 
     /**
      * Add a card with Stripe PaymentMethod ID
-     * This is the preferred method for adding cards with proper Stripe integration
+     * This attaches the PaymentMethod to a Stripe Customer for reuse, then saves to database
      */
     const addCardWithStripe = async (
         stripePaymentMethodId: string,
@@ -78,6 +78,47 @@ export function usePaymentCards() {
                 return false;
             }
 
+            // IMPORTANT: Attach PaymentMethod to Stripe Customer first
+            // This allows the PaymentMethod to be reused for future payments
+            console.log('Attaching payment method to Stripe customer...');
+            const { data: attachData, error: attachError } = await supabase.functions.invoke(
+                'attach-payment-method',
+                {
+                    body: {
+                        paymentMethodId: stripePaymentMethodId,
+                        email: session.user.email,
+                    },
+                    headers: {
+                        Authorization: `Bearer ${session.access_token}`,
+                    },
+                }
+            );
+
+            if (attachError) {
+                console.error('Error attaching payment method:', attachError);
+                // Try to get more details from the error
+                let errorMessage = 'Failed to save card to Stripe';
+                if (attachError.context instanceof Response) {
+                    try {
+                        const errorBody = await attachError.context.json();
+                        errorMessage = errorBody.error || errorMessage;
+                    } catch (e) {
+                        // Ignore parsing errors
+                    }
+                }
+                Alert.alert('Error', errorMessage);
+                return false;
+            }
+
+            if (!attachData?.success) {
+                console.error('Failed to attach payment method:', attachData?.error);
+                Alert.alert('Error', attachData?.error || 'Failed to save card');
+                return false;
+            }
+
+            console.log('Payment method attached successfully');
+
+            // Now save to database
             const isFirstCard = cards.length === 0;
 
             const { error } = await supabase

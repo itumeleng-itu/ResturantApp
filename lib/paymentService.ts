@@ -54,6 +54,7 @@ export async function createPaymentIntent(
                 amount: amountInCents,
                 currency,
                 paymentMethodId,
+                email: session.user.email, // For Stripe Customer creation/lookup
             },
             headers: {
                 Authorization: `Bearer ${session.access_token}`,

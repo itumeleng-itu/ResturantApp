@@ -21,10 +21,7 @@ export function useOrders() {
 
             const { data, error } = await supabase
                 .from('orders')
-                .select(`
-          *,
-          order_items(count)
-        `)
+                .select(`*,order_items(count)`)
                 .eq('user_id', session.user.id)
                 .order('created_at', { ascending: false });
 
@@ -37,7 +34,7 @@ export function useOrders() {
                 }));
 
                 setActiveOrders(formattedOrders.filter(o =>
-                    ['pending', 'preparing', 'on_the_way'].includes(o.status)
+                    ['pending', 'preparing', 'out_for_delivery'].includes(o.status)
                 ));
 
                 setPastOrders(formattedOrders.filter(o =>
