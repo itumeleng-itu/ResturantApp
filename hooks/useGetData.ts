@@ -103,23 +103,30 @@ export function useGetData() {
             setLoading(false)
         }
     }
-    //get optional ingredients
-    const getOPtionalIngredients = async () => {
+    //get optional ingredients for a specific menu item
+    const getOPtionalIngredients = async (menuItemId?: string) => {
         setLoading(true)
         setError(null)
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('optional_ingredients')
                 .select('*')
 
+            // Filter by menu item ID if provided
+            if (menuItemId) {
+                query = query.eq('menu_item_id', menuItemId)
+            }
+
+            const { data, error } = await query
+
             if (error) {
-                throw new Error
+                throw new Error(error.message)
             }
             return data;
         }
         catch (error) {
             console.error(error)
-            setError("Error fetching items")
+            setError("Error fetching ingredients")
         }
         finally {
             setLoading(false)

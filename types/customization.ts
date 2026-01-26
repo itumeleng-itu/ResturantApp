@@ -30,13 +30,14 @@ export type ExtraOption = {
     is_available: boolean;
 };
 
-// Optional ingredients (can be removed or added)
+// Optional ingredients (can be removed or added) - linked to specific menu items
 export type IngredientOption = {
     id: string;
+    menu_item_id: string;
     name: string;
-    is_removable: boolean;  // Can remove from item (e.g., "No onions")
-    is_addable: boolean;    // Can add to item (e.g., "Extra cheese")
-    add_price?: number;     // Price if adding
+    can_add: boolean;      // Can add extra (e.g., "Extra cheese")
+    can_remove: boolean;   // Can remove from item (e.g., "No onions")
+    add_price?: number;    // Price if adding (optional, not in your schema)
 };
 
 // Selected customization for a cart item

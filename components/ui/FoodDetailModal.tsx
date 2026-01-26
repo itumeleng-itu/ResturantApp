@@ -87,13 +87,14 @@ export default function FoodDetailModal({
     }, [visible, item?.id]);
 
     const loadOptions = async () => {
+        if (!item?.id) return;
         setLoadingOptions(true);
         try {
             const [sides, drinks, extras, ingredients] = await Promise.all([
                 getSideOptions(),
                 getDrinks(),
                 getExtras(),
-                getOptionalIngredients(),
+                getOptionalIngredients(item.id),
             ]);
 
             setSideOptions(sides || []);
@@ -109,8 +110,14 @@ export default function FoodDetailModal({
 
     if (!item) return null;
 
+    // Determine if item is a meal (not a drink, beverage, dessert, or alcohol)
+    // Customization options only appear for meals
+    const nonMealCategories = ['drinks', 'beverages', 'beverage', 'drink', 'alcohol', 'alcohols', 'dessert', 'desserts'];
+    const categoryLower = (item.category_name || item.category || '').toLowerCase();
+    const isMealItem = !nonMealCategories.some(cat => categoryLower.includes(cat));
+
     const hasImage = item.image_url && !imageError;
-    const customizationPrice = calculateCustomizationPrice(customization);
+    const customizationPrice = isMealItem ? calculateCustomizationPrice(customization) : 0;
     const itemTotalPrice = (item.price + customizationPrice) * quantity;
 
     // Handlers
@@ -238,7 +245,9 @@ export default function FoodDetailModal({
                     <TouchableOpacity onPress={onClose} className="p-2">
                         <MaterialIcons name="close" size={28} color="white" />
                     </TouchableOpacity>
-                    <Text className="text-white text-lg font-bold">Customize Order</Text>
+                    <Text className="text-white text-lg font-bold">
+                        {isMealItem ? 'Customize Order' : 'Add to Order'}
+                    </Text>
                     <View className="w-10" />
                 </View>
 
@@ -277,12 +286,13 @@ export default function FoodDetailModal({
                         R{item.price.toFixed(2)}
                     </Text>
 
-                    {loadingOptions ? (
+                    {/* Only show customization options for meal items */}
+                    {isMealItem && loadingOptions ? (
                         <View className="items-center py-10">
                             <ActivityIndicator size="large" color="#ea770c" />
                             <Text className="text-gray-400 mt-3">Loading options...</Text>
                         </View>
-                    ) : (
+                    ) : isMealItem ? (
                         <>
                             {/* Side Options */}
                             {sideOptions.length > 0 && (
@@ -414,7 +424,7 @@ export default function FoodDetailModal({
                                             <View key={ingredient.id} className="flex-row items-center justify-between p-4 bg-gray-800 rounded-xl border border-gray-700">
                                                 <Text className="text-white font-medium flex-1">{ingredient.name}</Text>
                                                 <View className="flex-row gap-2">
-                                                    {ingredient.is_removable && (
+                                                    {ingredient.can_remove && (
                                                         <TouchableOpacity
                                                             onPress={() => toggleIngredient(ingredient, 'remove')}
                                                             className={`px-3 py-2 rounded-lg ${
@@ -426,7 +436,7 @@ export default function FoodDetailModal({
                                                             <Text className="text-white text-sm font-medium">No</Text>
                                                         </TouchableOpacity>
                                                     )}
-                                                    {ingredient.is_addable && (
+                                                    {ingredient.can_add && (
                                                         <TouchableOpacity
                                                             onPress={() => toggleIngredient(ingredient, 'add')}
                                                             className={`px-3 py-2 rounded-lg ${
@@ -462,6 +472,25 @@ export default function FoodDetailModal({
                             />
                             <Text className="text-gray-500 text-xs text-right mt-1">
                                 {specialInstructions.length}/200
+                            </Text>
+                        </>
+                    ) : (
+                        /* Non-meal items (drinks, desserts) - only show special instructions */
+                        <>
+                            {renderSectionHeader('Special Instructions', 'Any special requests?')}
+                            <TextInput
+                                className="bg-gray-800 rounded-xl p-4 text-white border border-gray-700"
+                                placeholder="e.g., Extra ice, no straw..."
+                                placeholderTextColor="#666"
+                                value={specialInstructions}
+                                onChangeText={setSpecialInstructions}
+                                multiline
+                                numberOfLines={2}
+                                textAlignVertical="top"
+                                maxLength={100}
+                            />
+                            <Text className="text-gray-500 text-xs text-right mt-1">
+                                {specialInstructions.length}/100
                             </Text>
                         </>
                     )}
