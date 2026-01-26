@@ -201,6 +201,8 @@ export function usePaymentProcessing() {
         subtotal: number;
         deliveryFee: number;
         total: number;
+        num_items: number;  // Total quantity of all items
+        unique_items: number;  // Count of distinct products
         // Optional
         notes?: string;
     }
@@ -235,6 +237,8 @@ export function usePaymentProcessing() {
                     status: 'pending',
                     payment_status: paymentStatus,
                     notes: orderData.notes || null,
+                    num_items: orderData.num_items,
+                    unique_items: orderData.unique_items
                 })
                 .select()
                 .single();

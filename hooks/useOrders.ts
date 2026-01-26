@@ -21,26 +21,46 @@ export function useOrders() {
 
             const { data, error } = await supabase
                 .from('orders')
-                .select(`*,order_items(count)`)
+                .select(`
+                    *,
+                    order_items(
+                        *,
+                        menu_items(
+                            id,
+                            name,
+                            price,
+                            image_url,
+                            description
+                        )
+                    )
+                `)
                 .eq('user_id', session.user.id)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: false })
 
             if (error) throw error;
 
+            console.log("Fetched orders:", data?.length || 0);
+
             if (data) {
-                const formattedOrders = data.map(order => ({
+                const formattedOrders: Order[] = data.map(order => ({
                     ...order,
-                    items_count: order.order_items?.[0]?.count || 0
+                    // Use stored num_items from database, fallback to calculating from order_items
+                    num_items: order.num_items ??
+                        (order.order_items?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0),
+                    // Unique items = count of distinct products in the order
+                    unique_items: Array.isArray(order.order_items) ? order.order_items.length : 0
                 }));
-
-                setActiveOrders(formattedOrders.filter(o =>
+                const active = formattedOrders.filter(o =>
                     ['pending', 'preparing', 'out_for_delivery'].includes(o.status)
-                ));
-
-                setPastOrders(formattedOrders.filter(o =>
+                );
+                const past = formattedOrders.filter(o =>
                     ['delivered', 'cancelled'].includes(o.status)
-                ));
+                );
+                setActiveOrders(active);
+                setPastOrders(past);
             }
+
+
         } catch (err: any) {
             console.error('Error fetching orders:', err);
             setError(err.message);

@@ -20,7 +20,8 @@ export interface Order {
     notes?: string | null;
     created_at: string;
     updated_at: string;
-    items_count?: number; // Computed from join
+    num_items?: number;
+    unique_items?: number;
 }
 
 export interface OrderItem {

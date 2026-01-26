@@ -1,27 +1,5 @@
-/**
- * CART HOOK - useCart
- * 
- * This hook manages the shopping cart state across the entire app.
- * 
- * HOW IT WORKS:
- * - Uses React Context to share cart state globally
- * - Any component wrapped in CartProvider can access cart data
- * - Cart items are stored in memory (you can extend to persist in AsyncStorage)
- * 
- * USAGE:
- * 1. Wrap your app with <CartProvider> in _layout.tsx
- * 2. In any component, use: const { cartItems, addToCart, cartCount } = useCart();
- * 
- * AVAILABLE FUNCTIONS:
- * - addToCart(item, quantity) - Add item to cart
- * - removeFromCart(itemId) - Remove item from cart
- * - updateQuantity(itemId, quantity) - Update item quantity
- * - clearCart() - Empty the cart
- * - cartCount - Total number of items
- * - cartTotal - Total price of all items
- */
-
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { Alert } from 'react-native';
 
 // Type for items in the cart
 export type CartItem = {
@@ -29,13 +7,14 @@ export type CartItem = {
     name: string;
     price: number;
     quantity: number;
+    num_items: number;
     image_url?: string;
 };
 
 // Type for the cart context
 type CartContextType = {
     cartItems: CartItem[];
-    addToCart: (item: { id: string; name: string; price: number; image_url?: string }, quantity: number) => void;
+    addToCart: (item: { id: string; name: string; price: number; num_items?: number; image_url?: string }, quantity: number) => void;
     removeFromCart: (itemId: string) => void;
     updateQuantity: (itemId: string, quantity: number) => void;
     clearCart: () => void;
@@ -52,7 +31,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     // Add item to cart (or update quantity if already exists)
     const addToCart = (
-        item: { id: string; name: string; price: number; image_url?: string },
+        item: { id: string; name: string; price: number; num_items?: number; image_url?: string },
         quantity: number
     ) => {
         setCartItems((prevItems) => {
@@ -68,7 +47,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 );
             } else {
                 // Add new item to cart
-                return [...prevItems, { ...item, quantity }];
+                return [...prevItems, { ...item, quantity, num_items: item.num_items || quantity }];
             }
         });
     };
@@ -86,7 +65,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
         setCartItems((prevItems) =>
             prevItems.map((item) =>
-                item.id === itemId ? { ...item, quantity } : item
+                item.id === itemId ? { ...item, quantity, num_items: quantity } : item
             )
         );
     };

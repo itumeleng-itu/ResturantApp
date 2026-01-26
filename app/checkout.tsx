@@ -147,6 +147,8 @@ export default function CheckoutScreen() {
                     subtotal: cartTotal,
                     deliveryFee: deliveryFee,
                     total: totalWithDelivery,
+                    num_items: cartItems.reduce((total, item) => total + item.quantity, 0),  // Total quantity
+                    unique_items: cartItems.length,  // Number of distinct products
                     // Notes
                     notes: orderNotes.trim() || undefined,
                 });

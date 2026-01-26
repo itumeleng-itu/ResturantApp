@@ -9,12 +9,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CircularCategories from "@/components/ui/circularCategories";
 import FoodGrids from "@/components/ui/foodGrids";
 import Header from "@/components/ui/header";
-import SearchNFilter from "@/components/ui/searchNfilter";
+import SearchNFilter, { DEFAULT_FILTERS, FilterOptions } from "@/components/ui/searchNfilter";
 
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [activeCategory, setActiveCategory] = useState('All');
+  
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>(DEFAULT_FILTERS);
     
   return (
     <View style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
@@ -32,16 +36,25 @@ export default function HomeScreen() {
         </View>
 
         {/*search and filter*/}
-        <SearchNFilter/>
+        <SearchNFilter
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          filterOptions={filterOptions}
+          onFilterChange={setFilterOptions}
+        />
 
-        {/*categiries*/}
+        {/*categories*/}
         <CircularCategories 
           activeCategory={activeCategory} 
           onCategoryChange={setActiveCategory} 
         />
 
         {/*food grid */}
-        <FoodGrids selectedCategory={activeCategory} />
+        <FoodGrids 
+          selectedCategory={activeCategory}
+          searchQuery={searchQuery}
+          filterOptions={filterOptions}
+        />
         
       </ScrollView>
     </View>
