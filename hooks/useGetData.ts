@@ -240,6 +240,10 @@ export function useGetData() {
         loading,
         error,
         getAllItems,
-        getCategories
+        getCategories,
+        getSideOptions,
+        getDrinks,
+        getExtras,
+        getOptionalIngredients: getOPtionalIngredients,
     }
 }

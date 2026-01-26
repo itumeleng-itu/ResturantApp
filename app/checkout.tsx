@@ -36,7 +36,7 @@ import { supabase } from '@/lib/supabase';
 export default function CheckoutScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
-    const { cartItems, cartTotal, clearCart } = useCart();
+    const { cartItems, cartTotal, cartCount, uniqueItemsCount, clearCart } = useCart();
     const [isSuccess, setIsSuccess] = useState(false);
     const [orderNotes, setOrderNotes] = useState('');
     
@@ -147,8 +147,8 @@ export default function CheckoutScreen() {
                     subtotal: cartTotal,
                     deliveryFee: deliveryFee,
                     total: totalWithDelivery,
-                    num_items: cartItems.reduce((total, item) => total + item.quantity, 0),  // Total quantity
-                    unique_items: cartItems.length,  // Number of distinct products
+                    num_items: cartCount,  // Total quantity of all items
+                    unique_items: uniqueItemsCount,  // Number of distinct products
                     // Notes
                     notes: orderNotes.trim() || undefined,
                 });

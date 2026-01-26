@@ -86,6 +86,8 @@ export function DeliveryAddressSection({ selectedAddress, onChangePress }: Deliv
 /**
  * Order Summary Section Component
  */
+import { formatCustomizationSummary } from '@/types/customization';
+
 type OrderSummarySectionProps = {
     cartItems: CartItem[];
 };
@@ -95,25 +97,59 @@ export function OrderSummarySection({ cartItems }: OrderSummarySectionProps) {
         <View className="bg-white mx-4 mt-4 rounded-2xl p-4">
             <Text className="text-lg font-bold mb-4">Order Summary</Text>
             
-            {cartItems.map((item) => (
-                <View key={item.id} className="flex-row items-center py-3 border-b border-gray-50">
-                    {item.image_url ? (
-                        <Image 
-                            source={{ uri: item.image_url }} 
-                            className="w-16 h-16 rounded-xl bg-gray-100"
-                        />
-                    ) : (
-                        <View className="w-16 h-16 rounded-xl bg-gray-100 items-center justify-center">
-                            <MaterialIcons name="restaurant" size={24} color="#d1d5db" />
+            {cartItems.map((item) => {
+                const hasCustomizations = item.customizationPrice && item.customizationPrice > 0;
+                const totalPrice = item.totalItemPrice || (item.price * item.quantity);
+                const customizationLines = item.customization 
+                    ? formatCustomizationSummary(item.customization) 
+                    : [];
+
+                return (
+                    <View key={item.id} className="py-3 border-b border-gray-50">
+                        <View className="flex-row items-start">
+                            {item.image_url ? (
+                                <Image 
+                                    source={{ uri: item.image_url }} 
+                                    className="w-16 h-16 rounded-xl bg-gray-100"
+                                />
+                            ) : (
+                                <View className="w-16 h-16 rounded-xl bg-gray-100 items-center justify-center">
+                                    <MaterialIcons name="restaurant" size={24} color="#d1d5db" />
+                                </View>
+                            )}
+                            <View className="flex-1 ml-3">
+                                <Text className="font-semibold text-gray-800" numberOfLines={1}>
+                                    {item.name}
+                                </Text>
+                                <View className="flex-row items-center gap-2">
+                                    <Text className="text-gray-400 text-sm">
+                                        R{item.price.toFixed(2)} × {item.quantity}
+                                    </Text>
+                                    {hasCustomizations && (
+                                        <Text className="text-orange-500 text-sm">
+                                            +R{item.customizationPrice.toFixed(2)}
+                                        </Text>
+                                    )}
+                                </View>
+                            </View>
+                            <Text className="font-bold text-gray-800">
+                                R{totalPrice.toFixed(2)}
+                            </Text>
                         </View>
-                    )}
-                    <View className="flex-1 ml-3">
-                        <Text className="font-semibold text-gray-800" numberOfLines={1}>{item.name}</Text>
-                        <Text className="text-gray-400 text-sm">Qty: {item.quantity}</Text>
+                        
+                        {/* Customization details */}
+                        {customizationLines.length > 0 && (
+                            <View className="ml-19 mt-2 pl-4 border-l-2 border-orange-100">
+                                {customizationLines.map((line, index) => (
+                                    <Text key={index} className="text-gray-500 text-xs mb-0.5">
+                                        • {line}
+                                    </Text>
+                                ))}
+                            </View>
+                        )}
                     </View>
-                    <Text className="font-bold text-gray-800">R{(item.price * item.quantity).toFixed(2)}</Text>
-                </View>
-            ))}
+                );
+            })}
 
             {cartItems.length === 0 && (
                 <View className="items-center py-6">

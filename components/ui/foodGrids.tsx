@@ -127,9 +127,9 @@ export default function FoodGrids({
     setSelectedItem(null);
   };
 
-  // Handle add to cart from modal (with quantity)
-  const handleAddToCart = (item: FoodItem, quantity: number) => {
-    addToCart(item, quantity);
+  // Handle add to cart from modal (with quantity and customization)
+  const handleAddToCart = (item: FoodItem, quantity: number, customization?: any) => {
+    addToCart(item, quantity, customization);
   };
 
   // Loading state
