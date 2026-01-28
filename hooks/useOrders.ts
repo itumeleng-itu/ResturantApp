@@ -1,8 +1,11 @@
+import { useNotification } from '@/hooks/useNotification';
 import { supabase } from '@/lib/supabase';
 import { Order } from '@/types/order';
+import { formatDistanceToNow } from 'date-fns';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useOrders() {
+    const { showNotification } = useNotification();
     const [loading, setLoading] = useState(true);
     const [activeOrders, setActiveOrders] = useState<Order[]>([]);
     const [pastOrders, setPastOrders] = useState<Order[]>([]);
@@ -76,10 +79,25 @@ export function useOrders() {
         const subscription = supabase
             .channel('order-updates')
             .on('postgres_changes', {
-                event: '*',
+                event: 'UPDATE',
                 schema: 'public',
                 table: 'orders'
-            }, () => {
+            }, (payload: any) => {
+                console.log('Order update received:', payload);
+                const newOrder = payload.new;
+
+                // Check for approval update
+                if (newOrder.status === 'preparing' && newOrder.pickup_code && newOrder.eta) {
+                    // Calculate relative time
+                    const arrivalTime = formatDistanceToNow(new Date(newOrder.eta), { addSuffix: false });
+
+                    showNotification(
+                        "Order Approved!",
+                        `Code: ${newOrder.pickup_code}. Arriving in ${arrivalTime}.`,
+                        "success"
+                    );
+                }
+
                 fetchOrders();
             })
             .subscribe();
@@ -87,7 +105,7 @@ export function useOrders() {
         return () => {
             subscription.unsubscribe();
         };
-    }, [fetchOrders]);
+    }, [fetchOrders, showNotification]);
 
     return {
         loading,

@@ -1,50 +1,81 @@
-# Welcome to your Expo app 👋
+# Restaurant App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A modern, full-stack mobile application for food ordering and delivery management. Built with React Native (Expo) and Supabase.
 
-## Get started
+## Admin Dashboard / CMS
+Manage the menu, view active orders, and update order status via the hosted CMS:
+**[INSERT HOSTED CMS LINK HERE]**
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Features
 
-2. Start the app
+-   **User Authentication**: Secure sign-up and login using Supabase Auth.
+-   **Browse Menu**: View categories and products with detailed descriptions and images.
+-   **Cart Management**: Add items, adjust quantities, and calculate totals.
+-   **Secure Checkout**: integrated Stripe payments for credit card processing.
+-   **Real-time Order Tracking**:
+    -   Live status updates (Pending -> Preparing -> Out for Delivery -> Delivered).
+    -   **Push Notifications**: Instant alerts when orders are approved.
+    -   **ETA & Pickup Codes**: Automatically generated arrival times and secure verification codes.
+-   **Order History**: View past orders and re-order favorites.
+-   **Profile Management**: Manage delivery addresses and payment methods.
 
-   ```bash
-   npx expo start
-   ```
+## Tech Stack
 
-In the output, you'll find options to open the app in a
+-   **Frontend**: React Native, Expo, TypeScript, NativeWind (Tailwind CSS).
+-   **Backend**: Supabase (PostgreSQL, Auth, Realtime, Edge Functions).
+-   **Payments**: Stripe.
+-   **State Management**: React Hooks & Context API.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Getting Started
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Prerequisites
 
-## Get a fresh project
+-   Node.js (LTS)
+-   Expo CLI
+-   iOS Simulator or Android Emulator (or the Expo Go app on your physical device)
 
-When you're ready, run:
+### Installation
 
-```bash
-npm run reset-project
-```
+1.  **Clone the repository**
+    ```bash
+    git clone <repository-url>
+    cd ResturantApp
+    ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
 
-## Learn more
+3.  **Environment Setup**
+    Create a `.env` file in the root directory and add your keys:
+    ```env
+    EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+    EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+    EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
+    ```
 
-To learn more about developing your project with Expo, look at the following resources:
+4.  **Run the App**
+    Start the development server:
+    ```bash
+    npx expo start
+    ```
+    *If you encounter network issues (especially with Supabase/Stripe connections on physical devices), use:*
+    ```bash
+    npx expo start --clear --tunnel
+    ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Database Setup
 
-## Join the community
+ensure your Supabase project is configured with the necessary tables (`orders`, `menu_items`, `profiles`, etc.) and triggers.
+-   Run the migration in `supabase/approval_trigger.sql` to enable auto-generation of pickup codes and ETAs.
 
-Join our community of developers creating universal apps.
+## Contributing
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request

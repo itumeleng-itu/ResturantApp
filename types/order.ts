@@ -22,6 +22,8 @@ export interface Order {
     updated_at: string;
     num_items?: number;
     unique_items?: number;
+    pickup_code?: string | null;
+    eta?: string | null;
 }
 
 export interface OrderItem {

@@ -7,6 +7,7 @@ import '../global.css';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { CartProvider } from '@/hooks/useCart';
+import { NotificationProvider } from '@/hooks/useNotification';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -19,8 +20,10 @@ export default function RootLayout() {
 
   return (
     <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-      <CartProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <NotificationProvider>
+        <CartProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name='index' options={{headerShown: false}}/>
@@ -37,6 +40,7 @@ export default function RootLayout() {
           <StatusBar style="auto" />
         </ThemeProvider>
       </CartProvider>
+      </NotificationProvider>
     </StripeProvider>
   );
 }
