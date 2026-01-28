@@ -116,12 +116,12 @@ export default function CartModal({ visible, onClose }: CartModalProps) {
             <View className="mt-1">
                 {summaryLines.slice(0, 3).map((line, index) => (
                     <Text key={index} className="text-gray-500 text-xs" numberOfLines={1}>
-                        • {line}
+                        {`• ${line}`}
                     </Text>
                 ))}
                 {summaryLines.length > 3 && (
                     <Text className="text-gray-400 text-xs">
-                        +{summaryLines.length - 3} more
+                        {`+${summaryLines.length - 3} more`}
                     </Text>
                 )}
             </View>

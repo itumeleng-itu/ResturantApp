@@ -142,7 +142,7 @@ export function OrderSummarySection({ cartItems }: OrderSummarySectionProps) {
                             <View className="ml-19 mt-2 pl-4 border-l-2 border-orange-100">
                                 {customizationLines.map((line, index) => (
                                     <Text key={index} className="text-gray-500 text-xs mb-0.5">
-                                        • {line}
+                                        {`• ${line}`}
                                     </Text>
                                 ))}
                             </View>

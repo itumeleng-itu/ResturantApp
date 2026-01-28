@@ -1,100 +1,131 @@
-import { OrderCard } from '@/components/orders/OrderCard';
-import { useOrders } from '@/hooks/useOrders';
-import { Order } from '@/types/order';
-import { MaterialIcons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import { OrderCard } from "@/components/orders/OrderCard";
+import { useOrders } from "@/hooks/useOrders";
+import { Order } from "@/types/order";
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  StyleSheet,
   Text,
   TouchableOpacity,
-  View
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-type Tab = 'active' | 'history';
+type Tab = "active" | "history";
 
 export default function OrdersScreen() {
-  const [activeTab, setActiveTab] = useState<Tab>('active');
-  const { loading, activeOrders, pastOrders, refreshOrders, error } = useOrders();
+  const [activeTab, setActiveTab] = useState<Tab>("active");
+  const { loading, activeOrders, pastOrders, refreshOrders, error } =
+    useOrders();
 
   const handleOrderPress = (order: Order) => {
     // Navigate to order details screen when implemented
-    console.log('Order pressed:', order.id);
+    console.log("Order pressed:", order.id);
   };
 
   const renderEmptyState = () => (
-    <View style={styles.emptyContainer}>
-      <View style={styles.emptyIconContainer}>
+    <View className="flex-1 justify-center items-center pt-16">
+      <View className="w-20 h-20 bg-gray-100 rounded-full justify-center items-center mb-4">
         <MaterialIcons name="inventory" size={48} color="#D1D5DB" />
       </View>
-      <Text style={styles.emptyTitle}>No orders yet</Text>
-      <Text style={styles.emptySubtitle}>
-        {activeTab === 'active' 
-          ? "You don't have any active orders right now." 
+      <Text className="text-xl font-bold text-gray-700 mb-2">
+        No orders yet
+      </Text>
+      <Text className="text-base text-gray-500 text-center px-10 mb-6 leading-6">
+        {activeTab === "active"
+          ? "You don't have any active orders right now."
           : "Your order history is empty."}
       </Text>
-      <TouchableOpacity 
-        style={styles.browseButton}
-        onPress={() => {/* Navigate to home/menu */}}
+      <TouchableOpacity
+        className="bg-rose-600 px-6 py-3 rounded-xl"
+        onPress={() => {
+          /* Navigate to home/menu */
+        }}
       >
-        <Text style={styles.browseButtonText}>Browse Menu</Text>
+        <Text className="text-white text-base font-semibold">Browse Menu</Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Orders</Text>
+    <SafeAreaView className="flex-1 bg-gray-50" edges={["top"]}>
+      {/* Header */}
+      <View className="px-5 py-4 bg-white">
+        <Text className="text-3xl font-extrabold text-gray-900">My Orders</Text>
       </View>
 
-      <View style={styles.tabBar}>
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'active' && styles.activeTab]}
-          onPress={() => setActiveTab('active')}
+      {/* Tab Bar */}
+      <View className="flex-row bg-white px-5 border-b border-gray-100">
+        {/* Active Tab */}
+        <TouchableOpacity
+          className={`flex-row items-center py-4 mr-6 border-b-2 ${
+            activeTab === "active" ? "border-orange-600" : "border-transparent"
+          }`}
+          onPress={() => setActiveTab("active")}
         >
-          <MaterialIcons name="shopping-bag" size={20} color={activeTab === 'active' ? '#E11D48' : '#9CA3AF'} />
-          <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
+          <MaterialIcons
+            name="shopping-bag"
+            size={20}
+            color={activeTab === "active" ? "#E11D48" : "#9CA3AF"}
+          />
+          <Text
+            className={`ml-2 text-base font-semibold ${
+              activeTab === "active" ? "text-gray-900" : "text-gray-400"
+            }`}
+          >
             Active
           </Text>
-          {activeOrders.length > 0 && activeTab === 'active' && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{activeOrders.length}</Text>
+          {activeOrders.length > 0 && activeTab === "active" && (
+            <View className="bg-orange-600 rounded-full px-1.5 py-0.5 min-w-[20px] items-center justify-center ml-2">
+              <Text className="text-white text-[10px] font-bold">
+                {activeOrders.length}
+              </Text>
             </View>
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={[styles.tab, activeTab === 'history' && styles.activeTab]}
-          onPress={() => setActiveTab('history')}
+        {/* History Tab */}
+        <TouchableOpacity
+          className={`flex-row items-center py-4 border-b-2 ${
+            activeTab === "history" ? "border-orange-600" : "border-transparent"
+          }`}
+          onPress={() => setActiveTab("history")}
         >
-          <MaterialIcons name="history" size={20} color={activeTab === 'history' ? '#E11D48' : '#9CA3AF'} />
-          <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
+          <MaterialIcons
+            name="history"
+            size={20}
+            color={activeTab === "history" ? "#E11D48" : "#9CA3AF"}
+          />
+          <Text
+            className={`ml-2 text-base font-semibold ${
+              activeTab === "history" ? "text-gray-900" : "text-gray-400"
+            }`}
+          >
             History
           </Text>
         </TouchableOpacity>
       </View>
 
+      {/* Content */}
       {loading && !activeOrders.length && !pastOrders.length ? (
-        <View style={styles.loadingContainer}>
+        <View className="flex-1 justify-center items-center">
           <ActivityIndicator size="large" color="#E11D48" />
         </View>
       ) : (
         <FlatList
-          data={activeTab === 'active' ? activeOrders : pastOrders}
+          data={activeTab === "active" ? activeOrders : pastOrders}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <OrderCard order={item} onPress={handleOrderPress} />
           )}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{ padding: 20, flexGrow: 1 }}
           refreshControl={
-            <RefreshControl 
-              refreshing={loading} 
-              onRefresh={refreshOrders} 
-              colors={['#E11D48']} // Android
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={refreshOrders}
+              colors={["#E11D48"]} // Android
               tintColor="#E11D48" // iOS
             />
           }
@@ -104,110 +135,3 @@ export default function OrdersScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#111827',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    marginRight: 24,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    gap: 8,
-  },
-  activeTab: {
-    borderBottomColor: '#E11D48',
-  },
-  tabText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#9CA3AF',
-  },
-  activeTabText: {
-    color: '#111827',
-  },
-  badge: {
-    backgroundColor: '#E11D48',
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    minWidth: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  listContent: {
-    padding: 20,
-    flexGrow: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 60,
-  },
-  emptyIconContainer: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-    paddingHorizontal: 40,
-    marginBottom: 24,
-    lineHeight: 24,
-  },
-  browseButton: {
-    backgroundColor: '#E11D48',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  browseButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
