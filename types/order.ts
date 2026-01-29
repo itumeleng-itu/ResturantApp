@@ -4,6 +4,7 @@ export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 export interface Order {
     id: string;
     user_id: string;
+    driver_id?: string | null;
     user_name: string;
     user_surname: string;
     user_email: string;

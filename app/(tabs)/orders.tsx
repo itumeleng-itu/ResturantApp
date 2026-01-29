@@ -1,15 +1,17 @@
 import { OrderCard } from "@/components/orders/OrderCard";
+import { OrderDetailsModal } from "@/components/orders/OrderDetailsModal";
 import { useOrders } from "@/hooks/useOrders";
-import { Order } from "@/types/order";
+import { supabase } from "@/lib/supabase";
+import { Order, OrderItem } from "@/types/order";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    RefreshControl,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,10 +21,54 @@ export default function OrdersScreen() {
   const [activeTab, setActiveTab] = useState<Tab>("active");
   const { loading, activeOrders, pastOrders, refreshOrders, error } =
     useOrders();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
-  const handleOrderPress = (order: Order) => {
-    // Navigate to order details screen when implemented
-    console.log("Order pressed:", order.id);
+  const handleOrderPress = async (order: Order) => {
+    setSelectedOrder(order);
+    setLoadingDetails(true);
+    setDetailsModalVisible(true);
+
+    try {
+      // Fetch order items with menu item details
+      const { data, error } = await supabase
+        .from("order_items")
+        .select(`
+          *,
+          menu_items (
+            name,
+            image_url,
+            price
+          )
+        `)
+        .eq("order_id", order.id);
+
+      if (error) throw error;
+
+      // Map the nested structure to flat OrderItem structure
+      const formattedItems: OrderItem[] = (data || []).map((item: any) => ({
+        ...item,
+        name: item.menu_items?.name || 'Unknown Item',
+        image_url: item.menu_items?.image_url,
+        // Ensure price_at_time is used if available, otherwise fallback to current menu price
+        price_at_time: item.price_at_time || item.menu_items?.price || 0
+      }));
+
+      setOrderItems(formattedItems);
+    } catch (err) {
+      console.error("Error fetching order items:", err);
+      setOrderItems([]);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleCloseDetailsModal = () => {
+    setDetailsModalVisible(false);
+    setSelectedOrder(null);
+    setOrderItems([]);
   };
 
   const renderEmptyState = () => (
@@ -132,6 +178,14 @@ export default function OrdersScreen() {
           ListEmptyComponent={renderEmptyState}
         />
       )}
+
+      {/* Order Details Modal */}
+      <OrderDetailsModal
+        visible={detailsModalVisible}
+        order={selectedOrder}
+        items={orderItems}
+        onClose={handleCloseDetailsModal}
+      />
     </SafeAreaView>
   );
 }

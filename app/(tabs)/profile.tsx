@@ -249,6 +249,17 @@ export default function ProfileScreen() {
                 </View>
 
                 <View className="px-6 mt-6">
+                    <Text className="text-gray-400 text-sm mb-2 uppercase">Driver</Text>
+                    
+                    <MenuItem 
+                        icon="local-shipping" 
+                        title="Driver Dashboard"
+                        subtitle="Access driver tools"
+                        onPress={() => router.push('/driver/dashboard')}
+                    />
+                </View>
+
+                <View className="px-6 mt-6">
                     <Text className="text-gray-400 text-sm mb-2 uppercase">Settings</Text>
                     
                     <MenuItem 

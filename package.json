@@ -11,6 +11,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
     "@hugeicons/core-free-icons": "^3.1.1",
     "@hugeicons/react-native": "^1.0.11",

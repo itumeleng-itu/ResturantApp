@@ -10,7 +10,7 @@ export function useAuth() {
     const router = useRouter();
 
     // LOGIN
-    const login = async (email: string, password: string) => {
+    const login = async (email: string, password: string, shouldRedirect: boolean = true) => {
         setLoading(true);
         setError(null);
 
@@ -22,7 +22,9 @@ export function useAuth() {
 
             if (error) throw error;
 
-            router.replace('/(tabs)/home'); //to your menu page
+            if (shouldRedirect) {
+                router.replace('/(tabs)/home'); //to your menu page
+            }
 
             return { success: true, data };
         } catch (err: any) {
