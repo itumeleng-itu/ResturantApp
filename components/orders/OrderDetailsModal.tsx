@@ -3,13 +3,13 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { format, formatDistanceToNow } from "date-fns";
 import React from "react";
 import {
-    Dimensions,
-    Image,
-    Modal,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -75,9 +75,9 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
     >
       <View className="flex-1 bg-gray-50">
         {/* Header */}
-        <View 
-            className="bg-white border-b border-gray-200 px-5 pb-4 flex-row justify-between items-center"
-            style={{ paddingTop: insets.top + 10 }}
+        <View
+          className="bg-white border-b border-gray-200 px-5 pb-4 flex-row justify-between items-center"
+          style={{ paddingTop: insets.top + 10 }}
         >
           <View className="flex-1">
             <Text className="text-2xl font-bold text-gray-900">
@@ -260,6 +260,39 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({
               </View>
             </View>
           </View>
+
+          {/* Driver Information Section - Show when order is out for delivery */}
+          {order.status === "out_for_delivery" && order.driver_id && (
+            <View className="bg-white rounded-2xl p-4 mb-6 border-l-4 border-blue-500">
+              <View className="flex-row items-center mb-4">
+                <View className="w-12 h-12 bg-blue-100 rounded-full items-center justify-center mr-3">
+                  <MaterialIcons
+                    name="local-shipping"
+                    size={24}
+                    color="#2563eb"
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-xs text-gray-500">Your Driver</Text>
+                  <Text className="text-lg font-bold text-gray-900">
+                    {order.driver_name} {order.driver_surname}
+                  </Text>
+                </View>
+              </View>
+
+              <View className="border-t border-gray-100 pt-3">
+                <Text className="text-sm text-gray-600 mb-2">
+                  Driver Contact
+                </Text>
+                <View className="flex-row items-center">
+                  <Ionicons name="call-outline" size={18} color="#2563eb" />
+                  <Text className="text-blue-600 font-semibold ml-2">
+                    {order.driver_contact}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           {/* Payment Information Section */}
           {order.payment_status && (

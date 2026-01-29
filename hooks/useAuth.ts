@@ -23,7 +23,36 @@ export function useAuth() {
             if (error) throw error;
 
             if (shouldRedirect) {
-                router.replace('/(tabs)/home'); //to your menu page
+                const metadata = data.user?.user_metadata;
+                let role = metadata?.role;
+
+                // Fallback: Check profiles table if role is missing in metadata
+                if (!role && data.user) {
+                    try {
+                        const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('role')
+                            .eq('id', data.user.id)
+                            .single();
+
+                        if (profile) {
+                            role = profile.role;
+                        }
+                    } catch (err) {
+                        console.error('Error fetching role from profiles:', err);
+                    }
+                }
+
+                console.log('Login successful. Metadata:', JSON.stringify(metadata, null, 2));
+                console.log('Final Detected Role:', role);
+
+                if (role && role.toLowerCase() === 'driver') {
+                    console.log('Redirecting to driver dashboard...');
+                    router.replace('/driver/dashboard');
+                } else {
+                    console.log('Redirecting to customer home...');
+                    router.replace('/(tabs)/home');
+                }
             }
 
             return { success: true, data };

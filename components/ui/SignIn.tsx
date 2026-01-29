@@ -101,14 +101,6 @@ export default function LoginForm() {
           </TouchableOpacity>
         </View>
 
-        {/* Driver Portal Link */}
-        <TouchableOpacity 
-          onPress={() => router.push('/driver/login')}
-          className="mt-8 mb-8"
-        >
-          <Text className="text-gray-400 text-sm underline">Driver Portal Access</Text>
-        </TouchableOpacity>
-
       </View>
       </ScrollView>
     </KeyboardAvoidingView>

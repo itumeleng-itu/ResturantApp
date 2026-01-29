@@ -6,12 +6,12 @@ import { Order, OrderItem } from "@/types/order";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    RefreshControl,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -27,22 +27,43 @@ export default function OrdersScreen() {
   const [loadingDetails, setLoadingDetails] = useState(false);
 
   const handleOrderPress = async (order: Order) => {
-    setSelectedOrder(order);
     setLoadingDetails(true);
     setDetailsModalVisible(true);
 
     try {
+      let enrichedOrder = { ...order };
+
+      // Fetch driver details if order has a driver_id and is out for delivery
+      if (order.driver_id && order.status === "out_for_delivery") {
+        const { data: driverData, error: driverError } = await supabase
+          .from("profiles")
+          .select("id, first_name, last_name, phone")
+          .eq("id", order.driver_id)
+          .single();
+
+        if (!driverError && driverData) {
+          enrichedOrder = {
+            ...enrichedOrder,
+            driver_name: driverData.first_name,
+            driver_surname: driverData.last_name,
+            driver_contact: driverData.phone,
+          };
+        }
+      }
+
       // Fetch order items with menu item details
       const { data, error } = await supabase
         .from("order_items")
-        .select(`
+        .select(
+          `
           *,
           menu_items (
             name,
             image_url,
             price
           )
-        `)
+        `,
+        )
         .eq("order_id", order.id);
 
       if (error) throw error;
@@ -50,15 +71,17 @@ export default function OrdersScreen() {
       // Map the nested structure to flat OrderItem structure
       const formattedItems: OrderItem[] = (data || []).map((item: any) => ({
         ...item,
-        name: item.menu_items?.name || 'Unknown Item',
+        name: item.menu_items?.name || "Unknown Item",
         image_url: item.menu_items?.image_url,
         // Ensure price_at_time is used if available, otherwise fallback to current menu price
-        price_at_time: item.price_at_time || item.menu_items?.price || 0
+        price_at_time: item.price_at_time || item.menu_items?.price || 0,
       }));
 
+      setSelectedOrder(enrichedOrder);
       setOrderItems(formattedItems);
     } catch (err) {
       console.error("Error fetching order items:", err);
+      setSelectedOrder(order);
       setOrderItems([]);
     } finally {
       setLoadingDetails(false);

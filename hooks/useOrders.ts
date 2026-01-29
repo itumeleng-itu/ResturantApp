@@ -65,7 +65,7 @@ export function useOrders() {
             : 0,
         }));
         const active = formattedOrders.filter((o) =>
-          ["pending", "preparing", "out_for_delivery"].includes(o.status),
+          ["preparing", "out_for_delivery"].includes(o.status),
         );
         const past = formattedOrders.filter((o) =>
           ["delivered", "cancelled"].includes(o.status),

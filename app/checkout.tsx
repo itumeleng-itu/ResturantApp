@@ -151,6 +151,7 @@ export default function CheckoutScreen() {
                     unique_items: uniqueItemsCount,  // Number of distinct products
                     // Notes
                     notes: orderNotes.trim() || undefined,
+                    items: cartItems,
                 });
 
                 if (orderSuccess) {
