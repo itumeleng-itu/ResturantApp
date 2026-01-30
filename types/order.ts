@@ -32,6 +32,7 @@ export interface Order {
   driver_name?: string | null;
   driver_surname?: string | null;
   driver_contact?: string | null;
+  order_items?: OrderItem[];
 }
 
 export interface OrderItem {
@@ -43,4 +44,38 @@ export interface OrderItem {
   name: string; // From join
   image_url: string; // From join
   options?: any; // JSON for extras, sides, etc.
+  menu_items?: {
+    name: string;
+    price: number;
+    image_url: string;
+    description: string;
+  } | null;
+}
+
+import { PaymentMethod } from "./payment";
+
+// Data required to create an order
+export interface CheckoutOrderData {
+  // User info
+  userName: string;
+  userSurname: string;
+  userEmail: string;
+  userContact: string;
+  // Delivery address
+  deliveryStreet: string;
+  deliveryCity: string;
+  deliveryPostalCode: string;
+  // Payment info
+  cardLastFour: string;
+  paymentMethod: PaymentMethod;
+  // Order totals
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  num_items: number;
+  unique_items: number;
+  // Optional
+  notes?: string;
+  // Items - using any for now to avoid circular dependency or import issues, ideally CartItem
+  items: any[];
 }

@@ -113,7 +113,7 @@ export default function JobDetails() {
                 {/* Order Summary */}
                 <View className="mb-6 bg-gray-50 p-4 rounded-xl">
                     <Text className="text-gray-400 text-xs uppercase font-bold mb-3">Order Items</Text>
-                    {order.order_items?.map((item: any, index: number) => (
+                    {order.order_items?.map((item, index: number) => (
                         <View key={item.id || index} className="flex-row items-center mb-3">
                             <View className="bg-gray-200 w-8 h-8 rounded-full items-center justify-center mr-3">
                                 <Text className="font-bold text-gray-600">{item.quantity}x</Text>

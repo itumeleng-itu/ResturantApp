@@ -1,14 +1,10 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,
     Alert,
     ScrollView,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,6 +16,8 @@ import {
     PaymentSummarySection,
     PaymentWarning,
 } from '@/components/checkout/CheckoutComponents';
+import { CheckoutFooter } from '@/components/checkout/CheckoutFooter';
+import { OrderNotesSection } from '@/components/checkout/OrderNotesSection';
 import { SuccessAnimation } from '@/components/checkout/SuccessAnimation';
 import PaymentMethodSelector from '@/components/ui/paymentMethods';
 
@@ -169,23 +167,6 @@ export default function CheckoutScreen() {
         }
     };
 
-    const getPayButtonText = () => {
-        if (!selectedPayment) {
-            return 'Select Payment Method';
-        }
-
-        switch (selectedPayment.method) {
-            case 'new-card':
-                return 'Add Card to Continue';
-            case 'cash':
-                return `Confirm Order (Cash) - R${totalWithDelivery.toFixed(2)}`;
-            case 'wallet':
-                return `Pay with Wallet - R${totalWithDelivery.toFixed(2)}`;
-            case 'saved-card':
-            default:
-                return `Pay R${totalWithDelivery.toFixed(2)}`;
-        }
-    };
 
     const isPayButtonDisabled = () => {
         if (paymentLoading || cartItems.length === 0) return true;
@@ -236,55 +217,20 @@ export default function CheckoutScreen() {
                     />
 
                     {/* Order Notes Section */}
-                    <View className="bg-white mx-4 mt-4 rounded-2xl p-4">
-                        <Text className="text-lg font-bold mb-3">Order Notes</Text>
-                        <TextInput
-                            className="bg-gray-50 rounded-xl p-4 min-h-[100px] text-gray-700"
-                            placeholder="Add any special instructions for your order (e.g., no onions, extra spicy, ring doorbell...)"
-                            placeholderTextColor="#9ca3af"
-                            value={orderNotes}
-                            onChangeText={setOrderNotes}
-                            multiline
-                            textAlignVertical="top"
-                            maxLength={500}
-                        />
-                        <Text className="text-gray-400 text-xs text-right mt-2">
-                            {orderNotes.length}/500
-                        </Text>
-                    </View>
+                    <OrderNotesSection notes={orderNotes} onChange={setOrderNotes} />
 
                     {/* Spacer for bottom button */}
                     <View className="h-24" />
                 </ScrollView>
 
                 {/* Pay Now Button - Fixed at bottom */}
-                <View 
-                    className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4"
-                    style={{ paddingBottom: insets.bottom + 16 }}
-                >
-                    <TouchableOpacity
-                        onPress={handlePayment}
-                        disabled={isPayButtonDisabled()}
-                        className={`py-4 rounded-full items-center flex-row justify-center ${
-                            isPayButtonDisabled() ? 'bg-gray-300' : 'bg-[#ea770c]'
-                        }`}
-                    >
-                        {paymentLoading ? (
-                            <ActivityIndicator color="white" size="small" />
-                        ) : (
-                            <>
-                                <MaterialIcons 
-                                    name={selectedPayment?.method === 'cash' ? 'payments' : 'payment'} 
-                                    size={22} 
-                                    color="white" 
-                                />
-                                <Text className="text-white font-bold text-lg ml-2">
-                                    {getPayButtonText()}
-                                </Text>
-                            </>
-                        )}
-                    </TouchableOpacity>
-                </View>
+                <CheckoutFooter 
+                    onPress={handlePayment}
+                    disabled={isPayButtonDisabled()}
+                    loading={paymentLoading}
+                    total={totalWithDelivery}
+                    selectedPayment={selectedPayment}
+                />
             </View>
             {isSuccess && (
                 <SuccessAnimation 

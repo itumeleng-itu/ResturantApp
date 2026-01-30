@@ -40,6 +40,12 @@ export type IngredientOption = {
     add_price?: number;    // Price if adding (optional, not in your schema)
 };
 
+// Selected extra with quantity
+export type SelectedExtra = {
+    extra: ExtraOption;
+    quantity: number;
+};
+
 // Selected customization for a cart item
 export type ItemCustomization = {
     // Selected side options (usually 1-2 selections allowed)
@@ -47,17 +53,17 @@ export type ItemCustomization = {
     // Selected drink (optional)
     selectedDrink?: DrinkOption;
     // Selected extras with quantities
-    selectedExtras: {
-        extra: ExtraOption;
-        quantity: number;
-    }[];
+    selectedExtras: SelectedExtra[];
     // Ingredient modifications
-    ingredientMods: {
-        ingredient: IngredientOption;
-        action: 'add' | 'remove';
-    }[];
+    ingredientMods: IngredientModification[];
     // Special instructions text
     specialInstructions?: string;
+};
+
+// Ingredient modification (add or remove)
+export type IngredientModification = {
+    ingredient: IngredientOption;
+    action: 'add' | 'remove';
 };
 
 // Calculate total price of customizations

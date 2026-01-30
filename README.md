@@ -3,8 +3,14 @@
 A modern, full-stack mobile application for food ordering and delivery management. Built with React Native (Expo) and Supabase.
 
 ## Admin Dashboard / CMS
-Manage the menu, view active orders, and update order status via the hosted CMS:
-**[INSERT HOSTED CMS LINK HERE]**
+Manage the menu, view active orders, and update order status via the hosted CMS.
+
+- **Live CMS**: [https://resturant-app-cms.vercel.app/](https://resturant-app-cms.vercel.app/)
+- **CMS Repository**: [https://github.com/itumeleng-itu/ResturantAppCMS.git](https://github.com/itumeleng-itu/ResturantAppCMS.git)
+
+## Design Resources
+
+- **Figma Wireframes**: [View Design on Figma](https://www.figma.com/design/jFPcLqc4tNRTVIgRVynHcv/Wireframe?node-id=149-249&t=2mAlAmTFER0CYgvy-1)
 
 ---
 
@@ -61,6 +67,7 @@ Manage the menu, view active orders, and update order status via the hosted CMS:
     Start the development server:
     ```bash
     npx expo start
+    npx expo start -c --tunnel
     ```
     *If you encounter network issues (especially with Supabase/Stripe connections on physical devices), use:*
     ```bash

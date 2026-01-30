@@ -1,6 +1,6 @@
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
     ActivityIndicator,
     Alert,
@@ -13,59 +13,23 @@ import {
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Hooks & Services
+// Hooks & Services
+import { MenuItem } from '@/components/profile/MenuItem';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/lib/supabase';
-
-type UserProfile = {
-    id: string;
-    email: string;
-    name?: string;
-    surname?: string;
-    contact_number?: string;
-    avatar_url?: string;
-};
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 export default function ProfileScreen() {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     const { logout } = useAuth();
-    
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { profile, loading, isLoggedIn, checkAuthAndLoadProfile } = useUserProfile();
 
     // Refresh profile on focus
     useFocusEffect(
         useCallback(() => {
             checkAuthAndLoadProfile();
-        }, [])
+        }, [checkAuthAndLoadProfile])
     );
-
-    const checkAuthAndLoadProfile = async () => {
-        setLoading(true);
-        try {
-            const { data: { session } } = await supabase.auth.getSession();
-            
-            if (session?.user) {
-                setIsLoggedIn(true);
-                setProfile({
-                    id: session.user.id,
-                    email: session.user.email || '',
-                    name: session.user.user_metadata?.name || '',
-                    surname: session.user.user_metadata?.surname || '',
-                    contact_number: session.user.user_metadata?.contact_number || '',
-                    avatar_url: session.user.user_metadata?.avatar_url,
-                });
-            } else {
-                setIsLoggedIn(false);
-                setProfile(null);
-            }
-        } catch (error) {
-            console.error('Error loading profile:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Handle logout
     const handleLogout = () => {
@@ -85,36 +49,6 @@ export default function ProfileScreen() {
         );
     };
 
-    // Menu item component
-    const MenuItem = ({ 
-        icon, 
-        title, 
-        subtitle,
-        onPress,
-        showArrow = true,
-        danger = false
-    }: {
-        icon: keyof typeof MaterialIcons.glyphMap;
-        title: string;
-        subtitle?: string;
-        onPress?: () => void;
-        showArrow?: boolean;
-        danger?: boolean;
-    }) => (
-        <TouchableOpacity 
-            onPress={onPress}
-            className="flex-row items-center py-4 border-b border-gray-100"
-        >
-            <View className={`w-10 h-10 rounded-full items-center justify-center ${danger ? 'bg-red-100' : 'bg-gray-100'}`}>
-                <MaterialIcons name={icon} size={22} color={danger ? '#ef4444' : '#374151'} />
-            </View>
-            <View className="flex-1 ml-4">
-                <Text className={`font-medium ${danger ? 'text-red-500' : 'text-gray-800'}`}>{title}</Text>
-                {subtitle && <Text className="text-gray-400 text-sm">{subtitle}</Text>}
-            </View>
-            {showArrow && <MaterialIcons name="chevron-right" size={24} color="#9ca3af" />}
-        </TouchableOpacity>
-    );
 
     // Loading state
     if (loading) {
