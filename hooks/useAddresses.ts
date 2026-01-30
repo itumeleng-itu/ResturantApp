@@ -27,13 +27,12 @@ export function useAddresses() {
                 .order('is_default', { ascending: false });
 
             if (error) {
-                console.error('Error fetching addresses:', error);
                 setAddresses([]);
             } else {
                 setAddresses(data || []);
             }
         } catch (error) {
-            console.error('Error loading addresses:', error);
+            // Error loading addresses
         } finally {
             setLoading(false);
         }

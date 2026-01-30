@@ -35,7 +35,6 @@ export type CreatePaymentMethodResult = {
  */
 export const isStripeConfigured = (): boolean => {
     if (!STRIPE_PUBLISHABLE_KEY) {
-        console.error('Stripe publishable key is not configured');
         return false;
     }
     return true;

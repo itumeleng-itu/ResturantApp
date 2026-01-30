@@ -53,7 +53,6 @@ export default function StripeAddCardForm({ onSave, onCancel, saving }: StripeAd
             });
 
             if (error) {
-                console.error('Stripe error:', error);
                 Alert.alert('Payment Error', error.message || 'Failed to process card');
                 setProcessing(false);
                 return;
@@ -83,7 +82,6 @@ export default function StripeAddCardForm({ onSave, onCancel, saving }: StripeAd
                 setCardDetails({});
             }
         } catch (error: any) {
-            console.error('Error creating payment method:', error);
             Alert.alert('Error', error.message || 'Failed to save card');
         } finally {
             setProcessing(false);

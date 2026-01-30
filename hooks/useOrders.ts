@@ -46,7 +46,7 @@ export function useOrders() {
 
       if (error) throw error;
 
-      console.log("Fetched orders:", data?.length || 0);
+
 
       if (data) {
         const formattedOrders: Order[] = data.map((order) => ({
@@ -74,7 +74,7 @@ export function useOrders() {
         setPastOrders(past);
       }
     } catch (err: any) {
-      console.error("Error fetching orders:", err);
+
       setError(err.message);
     } finally {
       setLoading(false);
@@ -95,7 +95,7 @@ export function useOrders() {
           table: "orders",
         },
         (payload: any) => {
-          console.log("Order update received:", payload);
+
           const newOrder = payload.new;
           const oldOrder = payload.old;
 

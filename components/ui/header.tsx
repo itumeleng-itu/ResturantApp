@@ -1,6 +1,6 @@
 //libraries
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useFocusEffect , useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -51,7 +51,7 @@ export default function Header() {
         }
       }
     } catch (error) {
-      console.error("Error fetching default address:", error);
+      // Error fetching default address
     }
   };
 

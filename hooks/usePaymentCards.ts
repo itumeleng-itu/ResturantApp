@@ -40,14 +40,12 @@ export function usePaymentCards() {
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error('Error loading cards:', error);
                 setCards([]);
             } else {
                 const transformedCards = (data || []).map(transformCard);
                 setCards(transformedCards);
             }
         } catch (error) {
-            console.error('Error loading cards:', error);
             setCards([]);
         } finally {
             setLoading(false);
@@ -80,7 +78,6 @@ export function usePaymentCards() {
 
             // IMPORTANT: Attach PaymentMethod to Stripe Customer first
             // This allows the PaymentMethod to be reused for future payments
-            console.log('Attaching payment method to Stripe customer...');
             const { data: attachData, error: attachError } = await supabase.functions.invoke(
                 'attach-payment-method',
                 {
@@ -95,7 +92,6 @@ export function usePaymentCards() {
             );
 
             if (attachError) {
-                console.error('Error attaching payment method:', attachError);
                 // Try to get more details from the error
                 let errorMessage = 'Failed to save card to Stripe';
                 if (attachError.context instanceof Response) {
@@ -111,12 +107,11 @@ export function usePaymentCards() {
             }
 
             if (!attachData?.success) {
-                console.error('Failed to attach payment method:', attachData?.error);
                 Alert.alert('Error', attachData?.error || 'Failed to save card');
                 return false;
             }
 
-            console.log('Payment method attached successfully');
+
 
             // Now save to database
             const isFirstCard = cards.length === 0;
@@ -142,7 +137,6 @@ export function usePaymentCards() {
             Alert.alert('Success', 'Card added successfully');
             return true;
         } catch (error: any) {
-            console.error('Error adding card:', error);
             Alert.alert('Error', error.message || 'Failed to add card');
             return false;
         } finally {
@@ -195,7 +189,6 @@ export function usePaymentCards() {
             Alert.alert('Success', 'Card added successfully');
             return true;
         } catch (error: any) {
-            console.error('Error adding card:', error);
             Alert.alert('Error', error.message || 'Failed to add card');
             return false;
         } finally {
@@ -215,7 +208,6 @@ export function usePaymentCards() {
             await loadCards();
             Alert.alert('Success', 'Card removed successfully');
         } catch (error: any) {
-            console.error('Error deleting card:', error);
             Alert.alert('Error', 'Failed to delete card');
         }
     };

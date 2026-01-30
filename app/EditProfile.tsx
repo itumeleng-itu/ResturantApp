@@ -41,7 +41,7 @@ export default function EditProfileScreen() {
                 setContactNumber(session.user.user_metadata?.contact_number || '');
             }
         } catch (error) {
-            console.error('Error loading profile:', error);
+            // Error loading profile
         } finally {
             setLoading(false);
         }

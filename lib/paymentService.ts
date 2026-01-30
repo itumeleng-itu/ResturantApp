@@ -22,14 +22,12 @@ export async function createPaymentIntent(
     paymentMethodId: string,
     currency: string = 'zar'
 ): Promise<PaymentResult> {
-    console.log('Processing payment:', { amount: amountInCents, currency, paymentMethodId });
 
     try {
         // Get the current session and access token
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError) {
-            console.error('Session error:', sessionError);
             return {
                 success: false,
                 error: 'Authentication error. Please sign in again.',
@@ -37,16 +35,13 @@ export async function createPaymentIntent(
         }
 
         if (!session?.access_token) {
-            console.error('No access token found in session');
             return {
                 success: false,
                 error: 'Please sign in to complete payment.',
             };
         }
 
-        console.log('Session found, user:', session.user.email);
-        console.log('Access token exists:', !!session.access_token);
-        console.log('Token expires at:', new Date(session.expires_at! * 1000).toISOString());
+
 
         // Invoke the Edge Function with explicit Authorization header
         const { data, error } = await supabase.functions.invoke('create-payment-intent', {
@@ -62,10 +57,6 @@ export async function createPaymentIntent(
         });
 
         if (error) {
-            console.error('Supabase function error:', error);
-            console.error('Error name:', error.name);
-            console.error('Error message:', error.message);
-
             // Try to extract the specific error message from the response body
             let errorMessage = error.message;
             let errorDetails: any = {};
@@ -74,17 +65,15 @@ export async function createPaymentIntent(
             if (error.context && error.context instanceof Response) {
                 try {
                     const responseBody = await error.context.json();
-                    console.error('Response body:', JSON.stringify(responseBody, null, 2));
                     errorMessage = responseBody.error || responseBody.message || errorMessage;
                     errorDetails = responseBody;
                 } catch (e) {
                     // Try to get text if JSON parsing fails
                     try {
                         const textBody = await error.context.text();
-                        console.error('Response text:', textBody);
                         errorMessage = textBody || errorMessage;
                     } catch (textError) {
-                        console.error('Could not read response body');
+                        // Could not read response body
                     }
                 }
             }
@@ -96,11 +85,9 @@ export async function createPaymentIntent(
             };
         }
 
-        console.log('Payment response:', JSON.stringify(data, null, 2));
+
         return data as PaymentResult;
     } catch (error: any) {
-        console.error('Payment service error:', error);
-        console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
         return {
             success: false,
             error: error.message || 'An unexpected error occurred',

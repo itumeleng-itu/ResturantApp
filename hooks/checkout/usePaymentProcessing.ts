@@ -34,11 +34,7 @@ export function usePaymentProcessing() {
             // Convert Rands to cents for Stripe
             const amountInCents = Math.round(totalAmountRands * 100);
 
-            console.log("Processing payment:", {
-                paymentMethodId: stripePaymentMethodId,
-                amount: amountInCents,
-                currency: "zar",
-            });
+
 
             // Call our Supabase Edge Function to process the payment
             const result = await createPaymentIntent(
@@ -48,13 +44,11 @@ export function usePaymentProcessing() {
             );
 
             if (result.success) {
-                console.log("Payment successful:", result.paymentIntentId);
                 return true;
             }
 
             // Handle 3D Secure authentication if required
             if (result.requiresAction && result.clientSecret) {
-                console.log("3D Secure authentication required");
 
                 const { error: actionError } = await handleNextAction(
                     result.clientSecret,
@@ -76,7 +70,6 @@ export function usePaymentProcessing() {
             showPaymentError(result);
             return false;
         } catch (error: any) {
-            console.error("Card payment error:", error);
             Alert.alert(
                 "Payment Error",
                 error.message || "Failed to process payment",
@@ -89,7 +82,6 @@ export function usePaymentProcessing() {
      * Process cash on delivery order
      */
     const processCashPayment = async (): Promise<boolean> => {
-        console.log("Processing cash on delivery order");
         return true;
     };
 
@@ -97,7 +89,6 @@ export function usePaymentProcessing() {
      * Process digital wallet payment (Apple Pay, Google Pay)
      */
     const processWalletPayment = async (): Promise<boolean> => {
-        console.log("Processing wallet payment");
         Alert.alert(
             "Coming Soon",
             "Digital wallet payments (Apple Pay, Google Pay) will be available soon!",
@@ -146,8 +137,6 @@ export function usePaymentProcessing() {
 
             if (error || !data) throw error;
 
-            console.log("Order created successfully:", data.id);
-
             // Insert order items
             const orderItems = orderData.items.map((item) => ({
                 order_id: data.id,
@@ -169,7 +158,7 @@ export function usePaymentProcessing() {
                 .insert(orderItems);
 
             if (itemsError) {
-                console.error("Error creating order items:", itemsError);
+                // Error creating order items
                 // Optionally handle partial failure (rollback order?)
                 // For now, we'll throw, which assumes the UI handles the error
                 throw itemsError;
@@ -177,7 +166,6 @@ export function usePaymentProcessing() {
 
             return true;
         } catch (error) {
-            console.error("Error creating order:", error);
             return false;
         }
     };

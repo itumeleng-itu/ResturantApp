@@ -30,7 +30,7 @@ export function useCheckoutAddresses() {
                 if (defaultAddr) setSelectedAddress(defaultAddr);
             }
         } catch (error) {
-            console.error("Error loading addresses:", error);
+            // Error loading addresses
         } finally {
             setLoading(false);
         }

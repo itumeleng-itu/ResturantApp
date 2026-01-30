@@ -41,7 +41,7 @@ export function useFoodCustomization(item: FoodItem | null, visible: boolean) {
             setExtraOptions(extras || []);
             setIngredientOptions(ingredients || []);
         } catch (error) {
-            console.error('Error loading options:', error);
+            // Error loading options
         } finally {
             setLoadingOptions(false);
         }

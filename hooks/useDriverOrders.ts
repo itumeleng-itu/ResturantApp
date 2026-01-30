@@ -70,7 +70,7 @@ export function useDriverOrders() {
             setActiveJob(activeData ? formatOrder(activeData) : null);
 
         } catch (err: any) {
-            console.error("Error fetching driver jobs:", err);
+
             setError(err.message);
         } finally {
             setLoading(false);
@@ -126,8 +126,8 @@ export function useDriverOrders() {
 
             if (fetchError) throw fetchError;
 
-            if (order.pickup_code !== pin) {
-                throw new Error("Invalid PIN. Please try again.");
+            if (order.pickup_code?.toUpperCase() !== pin.toUpperCase()) {
+                throw new Error("Invalid code. Please try again.");
             }
 
             // Update status

@@ -6,12 +6,12 @@ import { Order, OrderItem } from "@/types/order";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    RefreshControl,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -80,7 +80,7 @@ export default function OrdersScreen() {
       setSelectedOrder(enrichedOrder);
       setOrderItems(formattedItems);
     } catch (err) {
-      console.error("Error fetching order items:", err);
+      // Error fetching order items
       setSelectedOrder(order);
       setOrderItems([]);
     } finally {

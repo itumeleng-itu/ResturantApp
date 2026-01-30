@@ -27,7 +27,7 @@ export function useUserProfile() {
                 setProfile(null);
             }
         } catch (error) {
-            console.error('Error loading profile:', error);
+            // Error loading profile
         } finally {
             setLoading(false);
         }

@@ -160,7 +160,6 @@ export default function CheckoutScreen() {
                 }
             }
         } catch (error) {
-            console.error('Payment error:', error);
             Alert.alert('Error', 'Something went wrong. Please try again.');
         } finally {
             setPaymentLoading(false);

@@ -1,18 +1,20 @@
+import { JobLocationMap } from "@/components/driver/JobLocationMap";
 import { useAuth } from "@/hooks/useAuth";
 import { useDriverOrders } from "@/hooks/useDriverOrders";
-import { JobLocationMap } from "@/components/driver/JobLocationMap";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    RefreshControl,
+    ScrollView,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -33,7 +35,18 @@ export default function DriverDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogout = () => {
-    logout(); // This handles replace to home
+    Alert.alert(
+      "Confirm Logout",
+      "Are you sure you want to log out?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { 
+          text: "Log Out", 
+          style: "destructive",
+          onPress: () => logout()
+        }
+      ]
+    );
   };
 
   const handleTakeJob = async (orderId: string) => {
@@ -42,7 +55,7 @@ export default function DriverDashboard() {
 
   const handleCompleteJob = async () => {
     if (pin.length < 3) {
-      Alert.alert("Invalid PIN", "Please enter a valid pickup code.");
+      Alert.alert("Invalid Code", "Please enter a valid pickup code.");
       return;
     }
     setIsSubmitting(true);
@@ -65,7 +78,11 @@ export default function DriverDashboard() {
   // ACTIVE JOB VIEW
   if (activeJob) {
     return (
-      <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
+      <KeyboardAvoidingView 
+        className="flex-1 bg-gray-50" 
+        style={{ paddingTop: insets.top }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <View className="px-6 py-4 bg-white shadow-sm flex-row justify-between items-center">
           <Text className="text-xl font-bold text-gray-800">Current Job</Text>
           <TouchableOpacity onPress={handleLogout}>
@@ -73,7 +90,7 @@ export default function DriverDashboard() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView className="flex-1 p-6">
+        <ScrollView className="flex-1 p-6" keyboardShouldPersistTaps="handled">
           {/* Location Map Component */}
           <JobLocationMap
             street={activeJob.delivery_street}
@@ -123,11 +140,12 @@ export default function DriverDashboard() {
 
             <TextInput
               className="w-full h-16 bg-gray-50 border border-gray-200 rounded-xl text-center text-3xl tracking-widest font-bold mb-6"
-              placeholder="PIN"
-              keyboardType="number-pad"
+              placeholder="CODE"
+              keyboardType="default"
+              autoCapitalize="characters"
               maxLength={6}
               value={pin}
-              onChangeText={setPin}
+              onChangeText={(text) => setPin(text.toUpperCase())}
             />
 
             <TouchableOpacity
@@ -155,7 +173,7 @@ export default function DriverDashboard() {
             </TouchableOpacity>
           </View>
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 

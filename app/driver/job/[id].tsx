@@ -49,7 +49,7 @@ export default function JobDetails() {
 
             setOrder(formatted);
         } catch (err) {
-            console.error(err);
+            // Error fetching order
         } finally {
             setLoading(false);
         }

@@ -42,7 +42,6 @@ export function usePaymentMethodSelector(
                 .order('is_default', { ascending: false });
 
             if (error) {
-                console.error("Error fetching cards:", error);
                 setSavedCards([]);
             } else {
                 const transformedCards: Card[] = (data || []).map(card => ({
@@ -67,7 +66,6 @@ export function usePaymentMethodSelector(
                 }
             }
         } catch (error) {
-            console.error(error);
             setSavedCards([]);
         } finally {
             setLoading(false);
@@ -109,7 +107,6 @@ export function usePaymentMethodSelector(
                                 .eq('id', cardId);
 
                             if (error) {
-                                console.error('Error deleting card:', error);
                                 Alert.alert('Error', 'Failed to delete card');
                             } else {
                                 // Clear selection if deleted card was selected
@@ -123,7 +120,6 @@ export function usePaymentMethodSelector(
                                 await fetchCards();
                             }
                         } catch (error) {
-                            console.error('Error deleting card:', error);
                             Alert.alert('Error', 'Failed to delete card');
                         }
                     },

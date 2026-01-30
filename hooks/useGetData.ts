@@ -27,7 +27,6 @@ export function useGetData() {
             return flattenedData;
         }
         catch (e) {
-            console.error(e)
             setError("Error fetching items")
         }
         finally {
@@ -51,7 +50,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -74,7 +72,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -96,7 +93,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -125,7 +121,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching ingredients")
         }
         finally {
@@ -147,7 +142,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -170,7 +164,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -192,7 +185,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -214,7 +206,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {
@@ -235,7 +226,6 @@ export function useGetData() {
             return data;
         }
         catch (error) {
-            console.error(error)
             setError("Error fetching items")
         }
         finally {

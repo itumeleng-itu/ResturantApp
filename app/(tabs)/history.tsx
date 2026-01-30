@@ -1,12 +1,12 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    RefreshControl,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -58,14 +58,13 @@ export default function HistoryScreen() {
                 .order('created_at', { ascending: false });
 
             if (error) {
-                console.error('Error fetching orders:', error);
-                // Use mock data if table doesn't exist
+                // Error fetching orders
                 setOrders([]);
             } else {
                 setOrders(data || []);
             }
         } catch (error) {
-            console.error('Error loading orders:', error);
+            // Error loading orders
         } finally {
             setLoading(false);
             setRefreshing(false);

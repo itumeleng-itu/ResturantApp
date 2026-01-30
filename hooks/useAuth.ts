@@ -39,18 +39,15 @@ export function useAuth() {
                             role = profile.role;
                         }
                     } catch (err) {
-                        console.error('Error fetching role from profiles:', err);
+                        // Error fetching role from profiles
                     }
                 }
 
-                console.log('Login successful. Metadata:', JSON.stringify(metadata, null, 2));
-                console.log('Final Detected Role:', role);
+
 
                 if (role && role.toLowerCase() === 'driver') {
-                    console.log('Redirecting to driver dashboard...');
                     router.replace('/driver/dashboard');
                 } else {
-                    console.log('Redirecting to customer home...');
                     router.replace('/(tabs)/home');
                 }
             }
@@ -131,7 +128,6 @@ export function useAuth() {
             if (error) throw error;
             return user;
         } catch (err: any) {
-            console.error('Error getting user:', err.message);
             return null;
         }
     };
@@ -143,7 +139,6 @@ export function useAuth() {
             if (error) throw error;
             return session;
         } catch (err: any) {
-            console.error('Error getting session:', err.message);
             return null;
         }
     };

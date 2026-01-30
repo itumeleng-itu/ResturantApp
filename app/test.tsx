@@ -1,13 +1,13 @@
 // app/index.tsx - SUPABASE CONNECTION TEST
 import React, { useState } from 'react'
-import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  ScrollView, 
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert
+import {
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native'
 import { supabase } from '../lib/supabase'
 
@@ -132,7 +132,6 @@ export default function TestScreen() {
       
       if (error) throw error
       
-      console.log('Item with relations:', data)
       Alert.alert(
         'Success!', 
         `Item: ${data.name}\n` +
