@@ -82,16 +82,25 @@ export function useDriverOrders() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user) throw new Error("Not authenticated");
 
-            const { error } = await supabase
+            // Use .select() to get the updated row back and verify the update worked
+            const { data, error } = await supabase
                 .from("orders")
                 .update({
                     driver_id: session.user.id,
                     status: 'out_for_delivery'
                 })
                 .eq("id", orderId)
-                .is("driver_id", null); // Ensure it hasn't been taken
+                .eq("status", "preparing") // Only take jobs that are in preparing status
+                .is("driver_id", null) // Ensure it hasn't been taken
+                .select()
+                .maybeSingle();
 
             if (error) throw error;
+
+            // Check if the update actually affected a row
+            if (!data) {
+                throw new Error("Job is no longer available. It may have been taken by another driver or the order status has changed.");
+            }
 
             await fetchJobs();
             return { success: true };
