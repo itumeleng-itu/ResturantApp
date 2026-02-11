@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 export function useGetData() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const loadingCounter = useRef(0);
+
+    const startLoading = () => {
+        loadingCounter.current += 1;
+        setLoading(true);
+    };
+
+    const stopLoading = () => {
+        loadingCounter.current = Math.max(0, loadingCounter.current - 1);
+        if (loadingCounter.current === 0) {
+            setLoading(false);
+        }
+    };
 
     //get all items in the menu
-    const getAllItems = async () => {
-        setLoading(true)
+    const getAllItems = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -30,13 +43,14 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
 
-    }
+    }, []);
+
     //get all the categories of the menu
-    const getCategories = async () => {
-        setLoading(true)
+    const getCategories = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -53,13 +67,14 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
 
-    }
+    }, []);
+
     //get drinks in the menu
-    const getDrinks = async () => {
-        setLoading(true)
+    const getDrinks = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -75,12 +90,13 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
+    }, []);
+
     ///get extras offered
-    const getExtras = async () => {
-        setLoading(true)
+    const getExtras = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -96,12 +112,13 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
+    }, []);
+
     //get optional ingredients for a specific menu item
-    const getOPtionalIngredients = async (menuItemId?: string) => {
-        setLoading(true)
+    const getOptionalIngredients = useCallback(async (menuItemId?: string) => {
+        startLoading()
         setError(null)
         try {
             let query = supabase
@@ -124,12 +141,13 @@ export function useGetData() {
             setError("Error fetching ingredients")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
+    }, []);
+
     //get order items( after making an order)
-    const getOrderItems = async () => {
-        setLoading(true)
+    const getOrderItems = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -145,13 +163,13 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
+    }, []);
 
     //get order details (e.g address)
-    const getOrders = async () => {
-        setLoading(true)
+    const getOrders = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -167,12 +185,13 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
+    }, []);
+
     //get all the payment cards
-    const getPaymentCards = async () => {
-        setLoading(true)
+    const getPaymentCards = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -188,12 +207,13 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
-    //get all the payment cards
-    const getSideOptions = async () => {
-        setLoading(true)
+    }, []);
+
+    //get side options
+    const getSideOptions = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -209,11 +229,12 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
-    const getProfile = async () => {
-        setLoading(true)
+    }, []);
+
+    const getProfile = useCallback(async () => {
+        startLoading()
         setError(null)
         try {
             const { data, error } = await supabase
@@ -229,9 +250,9 @@ export function useGetData() {
             setError("Error fetching items")
         }
         finally {
-            setLoading(false)
+            stopLoading()
         }
-    }
+    }, []);
 
     return {
         loading,
@@ -241,6 +262,6 @@ export function useGetData() {
         getSideOptions,
         getDrinks,
         getExtras,
-        getOptionalIngredients: getOPtionalIngredients,
+        getOptionalIngredients,
     }
 }

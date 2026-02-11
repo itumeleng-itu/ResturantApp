@@ -98,7 +98,7 @@ export function OrderSummarySection({ cartItems }: OrderSummarySectionProps) {
             <Text className="text-lg font-bold mb-4">Order Summary</Text>
             
             {cartItems.map((item) => {
-                const hasCustomizations = item.customizationPrice && item.customizationPrice > 0;
+                const hasCustomizations = !!(item.customizationPrice && item.customizationPrice > 0);
                 const totalPrice = item.totalItemPrice || (item.price * item.quantity);
                 const customizationLines = item.customization 
                     ? formatCustomizationSummary(item.customization) 
@@ -127,7 +127,7 @@ export function OrderSummarySection({ cartItems }: OrderSummarySectionProps) {
                                     </Text>
                                     {hasCustomizations && (
                                         <Text className="text-orange-500 text-sm">
-                                            +R{item.customizationPrice.toFixed(2)}
+                                            +R{(item.customizationPrice ?? 0).toFixed(2)}
                                         </Text>
                                     )}
                                 </View>

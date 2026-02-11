@@ -14,7 +14,7 @@ export const CartItemCard = ({ item, onUpdateQuantity, onRemove }: CartItemCardP
     // Calculate display price (base + customization)
     const unitPrice = item.price + (item.customizationPrice || 0);
     const totalPrice = item.totalItemPrice || unitPrice * item.quantity;
-    const hasCustomizations = item.customizationPrice && item.customizationPrice > 0;
+    const hasCustomizations = !!(item.customizationPrice && item.customizationPrice > 0);
 
     const renderCustomizationDetails = (item: CartItem) => {
         if (!item.customization) return null;

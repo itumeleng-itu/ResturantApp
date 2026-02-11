@@ -1,10 +1,6 @@
-import LottieView from 'lottie-react-native';
-import { Button } from '@rneui/themed';
-import { useRouter } from "expo-router";
-import { Text, View } from "react-native";
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
 import LoginForm from '@/components/ui/SignIn';
+import { View } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function SignIn() {
   const insets = useSafeAreaInsets();
